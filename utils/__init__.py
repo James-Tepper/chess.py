@@ -1,23 +1,9 @@
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import SupportsIndex
 
-
-from enum import StrEnum
-
-
-class Color(StrEnum):
-    BLACK = "BLACK"
-    WHITE = "WHITE"
-
-
-class Name(StrEnum):
-    KING = "KING"
-    QUEEN = "QUEEN"
-    ROOK = "ROOK"
-    BISHOP = "BISHOP"
-    KNIGHT = "KNIGHT"
-    PAWN = "PAWN"
+from utils.enums import Color, Name
 
 
 class ChessPiece:
@@ -25,30 +11,39 @@ class ChessPiece:
         self.color = color
         self.name = name
 
-    def get_legal_moves(self, board_state, position):
-        """
-        Returns a list of legal moves for a piece at a given position.
-        """
-        # Check if king is directly hit by illegal move check()
+        if not name == Name.KNIGHT:
+            self.abrev = str(color[0:1] + name[0:1]).upper()
+        else:
+            self.abrev = str(color[0:1] + "N").upper()
 
-        ...
+
+    # def check_if_valid_move(self, board_state, position):
+    #     # Check if king is directly hit by move check(color)
+    #     ...
 
     def is_within_board(self, position):
         row, col = position
-        return 0 <= row < 8 and 0 <= col < 8
+        return 0 <= row < 7 and 0 <= col < 7
 
-    def is_square_occupied(self, board_state, position):
+    # TODO Make 'position' for 'selected piece'
+    def is_square_occupied(self, board_state: ChessBoard, position) -> bool | ChessPiece:
         row, col = position
-        return board_state[row][col] is not None
+        return board_state.curr_position[row][col] is not None
 
-    def is_square_occupied_by_oppenent(self, board_state, position):
+    def is_square_occupied_by_oppenent(
+        self, board_state: ChessBoard, position
+    ) -> bool | ChessPiece:
         row, col = position
-        piece = board_state[row][col]  # TODO better variable name
 
-        if piece is not None and not piece.color == self.color:
-            return piece
+        piece = board_state.curr_position[row][col]  # TODO better variable name
 
-        return None  # TODO fix?
+        # TODO Maybe fix: Currently returns either Piece on specific square or True (meaning opp is on square)
+        if piece:
+            piece: ChessPiece
+            return piece if not piece.color == self.color else True
+            # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
+
+        return False
 
 
 class King(ChessPiece):
@@ -81,18 +76,19 @@ class Pawn(ChessPiece):
         super().__init__(color, name)
 
 
-
 ROW = ["1", "2", "3", "4", "5", "6", "7", "8"]
 COLUMN = ["A", "B", "C", "D", "E", "F", "G", "H"]
-
-
 
 
 # utils/board.py
 class ChessBoard:
     def __init__(self) -> None:
-        self.board: list[list[None | ChessPiece]] = [[None for _ in range(8)] for _ in range(8)]
-        self.labeled_board = [[letter + number for number in ROW] for letter in COLUMN] #TODO Implement (reference will be offset by 1)
+        self.curr_position: list[list[None | ChessPiece]] = [
+            [None for _ in range(8)] for _ in range(8)
+        ]
+        self.labeled_board = [
+            [letter + number for number in ROW] for letter in COLUMN
+        ]  # TODO Implement (reference will be offset by 1)
 
     def initialize_board(self):
         ...
@@ -119,10 +115,23 @@ class Game:
         ...
 
 
+class Player:
+    def __init__(self, color: Color) -> None:
+        self.turn = color == Color.WHITE
+
+
+class Move(Player):
+    def check_if_valid_move(self, board_state, position):
+        ...
+
+
+# TODO Implement checker if king is directly hit by move check(color)
+
 # class Piece:
 #     def __init__(self, name: PieceName) -> None:
 #         self.name = PieceName
 
 
 class MoveHistory:
-    ...
+    def __init__(self) -> None:
+        ...
