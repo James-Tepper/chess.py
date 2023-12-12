@@ -1,5 +1,6 @@
 import setup
 from utils.game import Game
+from utils import LABELED_BOARD
 
 
 def main():
@@ -8,25 +9,9 @@ def main():
     # pieces = setup.create_pieces()
 
     board = empty_board.populate_board()
-    print(board)
+    # print(board)
 
 if "__main__" == __name__:
     main()
 
 
-'''
-
-[
-WHITE
-idx=0    [],
-idx=1    [],
-idx=2    [],
-idx=3    [],
-idx=4    [],
-idx=5    [],
-idx=6    [],
-idx=7    [],
-BLACK
-]
-
-'''

@@ -17,9 +17,9 @@ class Name(StrEnum):
 
 
 class ChessPiece:
-    def __init__(self, color: Color, name: Name) -> None:
-        self.color = color
+    def __init__(self, name: Name, color: Color) -> None:
         self.name = name
+        self.color = color
         self.abrev: str
 
         piece_abrev = name[0:1] if not name == Name.KNIGHT else "N"
@@ -36,29 +36,29 @@ class ChessPiece:
 
 class King(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.KING)
+        super().__init__(Name.KING, color)
 
 
 class Queen(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.QUEEN)
+        super().__init__(Name.QUEEN, color)
 
 
 class Rook(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.ROOK)
+        super().__init__(Name.ROOK, color)
 
 
 class Bishop(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.BISHOP)
+        super().__init__(Name.BISHOP, color)
 
 
 class Knight(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.KNIGHT)
+        super().__init__(Name.KNIGHT, color)
 
 
 class Pawn(ChessPiece):
     def __init__(self, color: Color) -> None:
-        super().__init__(color, name=Name.PAWN)
+        super().__init__(Name.PAWN, color)
