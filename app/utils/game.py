@@ -9,10 +9,18 @@ class Game:
     def __init__(self, current_turn: Color = Color.WHITE) -> None:
         self.board = ChessBoard()
         self.current_turn = current_turn
+        self.players = {
+            Color.WHITE: Player(Color.WHITE),
+            Color.BLACK: Player(Color.BLACK),
+        }
+
+        # Positive value = White Advantage | Negative value = Black Advantage
+        self.material_advantage: int = 0
+        self.positional_advantage: float = 0.0
 
     def switch_turn(self):
         self.current_turn = (
-            Color.BLACK if self.current_turn == Color.WHITE else Color.WHITE
+            Color.WHITE if self.current_turn == Color.BLACK else Color.BLACK
         )
 
     def check_for_checkmate(self):
@@ -21,9 +29,15 @@ class Game:
 
 class Player:
     def __init__(self, color: Color) -> None:
-        self.turn = color == Color.WHITE
+        self.color = color
+
+    """
+    def take(self):
+        
+    """
+
     def move(self):
-        ... # TODO if self.turn MOVE.ENABLE
+        ...  # TODO if self.turn MOVE.ENABLE
 
 
 class Move(Player):
