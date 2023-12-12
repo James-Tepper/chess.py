@@ -1,13 +1,12 @@
 from typing import Literal
 
 from utils import (
-    FILE_TO_INDEX,
     FILES,
-    LABELED_BOARD,
-    RANK_TO_INDEX,
     RANKS,
+    LABELED_BOARD,
     STARTING_POSITION,
 )
+
 from utils.piece import Bishop, ChessPiece, Color, King, Knight, Name, Pawn, Queen, Rook
 
 
@@ -18,7 +17,7 @@ class ChessBoard:
         ]
         self.squares = LABELED_BOARD
 
-    def get_board_position_index(self, square) -> list[int]:
+    def get_index_of_square(self, square: str) -> list[int]:
         """
         Takes square (A1-H8)
         Returns int pointing to specific board position
@@ -29,20 +28,15 @@ class ChessBoard:
         if not len(square) == 2:
             raise ValueError("Square can only be 2 characters")
 
-        rank = RANK_TO_INDEX[square[1]]
-        file = FILE_TO_INDEX[square[0]]
+        rank = RANKS.index(square[1])
+        file = FILES.index(square[0])
 
         return [rank, file]
 
         # self.squares.index(square)
 
-    def get_board_square(self):
-        """
-        [0,0] A8  [0,7] H8
-
-
-        [7,0] A1  [7,7] H1
-        """
+    def get_square_of_index(self, idx: list[int]) -> str:
+        ...
 
     # def populate_board(self, pieces: list[ChessPiece]):
     def populate_board(self):
@@ -58,9 +52,13 @@ class ChessBoard:
                     piece_class_name = eval(piece_type.title())
                     new_piece = piece_class_name(color=color)
 
-                    square_idxs = self.get_board_position_index(square=position)
+                    sqr_idxs = self.get_index_of_square(square=position)
                     
-                    self.position[square_idxs[0]][square_idxs[1]] = new_piece
+                    rank = sqr_idxs[0]
+                    file = sqr_idxs[1]
+
+                    self.position[rank][file] = new_piece
+                    
 
                     #                     print(f'''
                     # piece_type= KING
@@ -70,7 +68,6 @@ class ChessBoard:
                     # position= E1
                     #                           ''')
 
-                    return
 
     def is_square_occupied(self, square) -> bool | ChessPiece:
         row, col = square

@@ -25,6 +25,6 @@ LABELED_BOARD: list[list[str]] = [
     [letter + number for letter in FILES] for number in RANKS[::-1]
 ]
 
-FILE_TO_INDEX = {file: idx for file, idx in zip(FILES, range(7))}  # type: ignore
+# FILE_TO_INDEX = {file: idx for file, idx in zip(FILES, range(7))}  # type: ignore
 
-RANK_TO_INDEX = {rank: idx for rank, idx in zip(RANKS, range(7))}  # type: ignore
+# RANK_TO_INDEX = {rank: idx for rank, idx in zip(RANKS, range(7))}  # type: ignore
