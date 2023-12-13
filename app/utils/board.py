@@ -1,7 +1,15 @@
 from typing import Literal
 
-from utils import FILES, LABELED_BOARD, POSITION_IDX, RANKS, STARTING_POSITION
+from utils import (
+    FILES,
+    LABELED_BOARD,
+    POSITION_IDX,
+    RANKS,
+    SQUARE_TYPE,
+    STARTING_POSITION,
+)
 from utils.piece import Bishop, ChessPiece, Color, King, Knight, Name, Pawn, Queen, Rook
+from utils.player import Player
 
 
 class ChessBoard:
@@ -11,23 +19,23 @@ class ChessBoard:
         ]
         self.squares = LABELED_BOARD
 
-    def get_index_of_square(self, square: str) -> list[int]:
+    def get_index_of_square(
+        self, square: SQUARE_TYPE
+    ) -> dict[Literal["file", "rank"], int]:
         """
         Takes square (A1-H8)
         Returns list[int] pointing to specific board position
         NOTE: Base format is File + Rank | Position array requires indexing Rank prior to File
         """
         assert not square in LABELED_BOARD
+        assert len(square) == 2
 
-        if not len(square) == 2:
-            raise ValueError("Square can only be 2 characters")
-
-        rank = 7 - RANKS.index(square[1])  # 7 for idx offset
+        rank = (7 - RANKS.index(square[1]))  # 7 for idx offset
         file = FILES.index(square[0])
 
-        return [file, rank]
+        return {"file": file, "rank": rank}
 
-    def get_square_of_index(self, rank: POSITION_IDX, file: POSITION_IDX) -> str:
+    def _get_square_of_index(self, rank: POSITION_IDX, file: POSITION_IDX) -> str:
         """
         Takes list[2 idxs] (rank, file)
         Returns square (A1-H8)
@@ -43,36 +51,20 @@ class ChessBoard:
         positions_by_color: dict[Color, list[str]]
         color: Color
         positions: list[str]
-        square: str
+        square: SQUARE_TYPE
 
         for piece_type, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
-                for square in positions:
-                    sqr_idxs = self.get_index_of_square(square=square)
+                for square in positions: # type: ignore
+                    sqr_idxs = self.get_index_of_square(square)
 
-                    rank = sqr_idxs[1]  # type: ignore
-                    file = sqr_idxs[0]  # type: ignore
+                    rank = sqr_idxs["rank"]  # type: ignore
+                    file = sqr_idxs["file"]  # type: ignore
 
-                    piece_class_name = eval(piece_type.title())
-                    new_piece: ChessPiece = piece_class_name(color=color)
+                    piece_cls = eval(piece_type.title())
+                    new_piece: ChessPiece = piece_cls(color)
 
-                    self.position[rank][file] = new_piece
-
-    def is_square_occupied(self, square) -> bool | ChessPiece:
-        row, col = square
-        return self.position[row][col] is not None
-
-    def is_square_occupied_by_oppenent(self, square) -> bool | ChessPiece:
-        row, col = square
-
-        piece = self.position[row][col]  # TODO better variable name
-
-        # TODO Maybe fix: Currently returns either Piece on specific square or True (meaning opp is on square)
-        if not isinstance(piece, ChessPiece):
-            return False
-            # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
-
-        return piece if not piece.color == square.color else True
+                    self.position[rank][file] = new_piece  # type: ignore
 
     def display(self):
         ...

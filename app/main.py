@@ -9,8 +9,9 @@ def main():
     # Currently empty
     board = game_state.board
     board.setup()
-    board.get_square_of_index(rank=0, file=0)
-    
+    # board._get_square_of_index(rank=0, file=0)
+    # print(LABELED_BOARD)
+    board.get_index_of_square("H1")
 
 if "__main__" == __name__:
     main()
