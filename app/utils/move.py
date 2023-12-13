@@ -1,3 +1,19 @@
+
+
+class Move:
+    def check_if_valid_move(self, board_state, position):
+        ...
+
+
+# TODO Implement checker if king is directly hit by move check(color)
+
+
+class MoveHistory:
+    def __init__(self) -> None:
+        ...
+
+
+
 # General Movement
 def move_piece(board_state, from_position, to_position):
     ...

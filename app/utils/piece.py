@@ -19,10 +19,12 @@ class Name(StrEnum):
 
 class ChessPiece:
     PIECE_NAME: Name
-
     def __init__(self, color: Color) -> None:
         self.color = color
         self.abrev: str
+        self.value: int
+        self.has_moved: bool = False
+        self.possible_moves: list[tuple] #RankFile || [idx][idx]
         
         piece_abrev = (
             self.PIECE_NAME[0:1] if not self.PIECE_NAME == Name.KNIGHT else "N"
@@ -43,7 +45,7 @@ class King(ChessPiece):
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
-
+        # King doesn't have a value
 
 class Queen(ChessPiece):
     PIECE_NAME = Name.QUEEN

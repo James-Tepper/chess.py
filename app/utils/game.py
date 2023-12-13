@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from utils.board import ChessBoard
 from utils.piece import Color
-
+from utils.player import Player
 
 # utils/game.py
 class Game:
@@ -24,34 +24,4 @@ class Game:
         )
 
     def check_for_checkmate(self):
-        ...
-
-
-class Player:
-    def __init__(self, color: Color) -> None:
-        self.color = color
-
-    """
-    def take(self):
-        
-    """
-
-    def move(self):
-        ...  # TODO if self.turn MOVE.ENABLE
-
-
-class Move(Player):
-    def check_if_valid_move(self, board_state, position):
-        ...
-
-
-# TODO Implement checker if king is directly hit by move check(color)
-
-# class Piece:
-#     def __init__(self, name: PieceName) -> None:
-#         self.name = PieceName
-
-
-class MoveHistory:
-    def __init__(self) -> None:
         ...

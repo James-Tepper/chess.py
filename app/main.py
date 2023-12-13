@@ -5,10 +5,12 @@ from utils import LABELED_BOARD
 
 def main():
     game_state = Game()
-    empty_board = game_state.board
-    # pieces = setup.create_pieces()
-
-    empty_board.populate_board()
+    
+    # Currently empty
+    board = game_state.board
+    board.setup()
+    board.get_square_of_index(rank=0, file=0)
+    
 
 if "__main__" == __name__:
     main()
