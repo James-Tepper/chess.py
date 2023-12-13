@@ -1,12 +1,6 @@
 from typing import Literal
 
-from utils import (
-    FILES,
-    RANKS,
-    LABELED_BOARD,
-    STARTING_POSITION,
-)
-
+from utils import FILES, LABELED_BOARD, RANKS, STARTING_POSITION
 from utils.piece import Bishop, ChessPiece, Color, King, Knight, Name, Pawn, Queen, Rook
 
 
@@ -20,7 +14,7 @@ class ChessBoard:
     def get_index_of_square(self, square: str) -> list[int]:
         """
         Takes square (A1-H8)
-        Returns int pointing to specific board position
+        Returns list[int] pointing to specific board position
         NOTE: Base format is File + Rank but position array requires indexing Rank prior to File
         """
         assert not square in LABELED_BOARD
@@ -28,7 +22,7 @@ class ChessBoard:
         if not len(square) == 2:
             raise ValueError("Square can only be 2 characters")
 
-        rank = RANKS.index(square[1])
+        rank = (7 - RANKS.index(square[1])) # 7 for idx offset
         file = FILES.index(square[0])
 
         return [rank, file]
@@ -39,34 +33,39 @@ class ChessBoard:
         ...
 
     # def populate_board(self, pieces: list[ChessPiece]):
+
     def populate_board(self):
         piece_type: Name
         positions_by_color: dict[Color, list[str]]
         color: Color
         positions: list[str]
-        position: str
+        square: str
 
         for piece_type, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
-                for position in positions:
-                    piece_class_name = eval(piece_type.title())
-                    new_piece = piece_class_name(color=color)
+                for square in positions:
+                    sqr_idxs = self.get_index_of_square(square=square)
 
-                    sqr_idxs = self.get_index_of_square(square=position)
-                    
-                    rank = sqr_idxs[0]
-                    file = sqr_idxs[1]
+                    rank = sqr_idxs[0]  # type: ignore
+                    file = sqr_idxs[1]  # type: ignore
+
+                    piece_class_name = eval(piece_type.title())
+                    new_piece: ChessPiece = piece_class_name(color=color)
 
                     self.position[rank][file] = new_piece
-                    
 
-                    #                     print(f'''
-                    # piece_type= KING
-                    # positions_by_color= <Color.WHITE: 'WHITE'>: ['E1'], <Color.BLACK: 'BLACK'>: ['E8']
-                    # color= WHITE
-                    # positions= ['E1']
-                    # position= E1
-                    #                           ''')
+        # Testing
+        for rank_1, rank_2 in zip(self.position, LABELED_BOARD):
+            print(f"[[[{rank_1} ||| {rank_2}]]]")
+
+ 
+                    # print(f'''
+                        # piece_type= KING
+                        # positions_by_color= <Color.WHITE: 'WHITE'>: ['E1'], <Color.BLACK: 'BLACK'>: ['E8']
+                        # color= WHITE
+                        # positions= ['E1']
+                        # position= E1
+                    # ''')
 
 
     def is_square_occupied(self, square) -> bool | ChessPiece:
@@ -90,7 +89,3 @@ class ChessBoard:
 
     def move_piece(self):
         ...
-
-
-def display_board(board_state):
-    ...

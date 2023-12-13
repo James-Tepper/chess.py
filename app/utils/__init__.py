@@ -22,8 +22,9 @@ STARTING_POSITION: dict[Name, dict[Color, list[str]]] = {
 }
 
 LABELED_BOARD: list[list[str]] = [
-    [letter + number for letter in FILES] for number in RANKS[::-1]
+    [file + rank for file in FILES] for rank in RANKS[::-1]
 ]
+
 
 # FILE_TO_INDEX = {file: idx for file, idx in zip(FILES, range(7))}  # type: ignore
 

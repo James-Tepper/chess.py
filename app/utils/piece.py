@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+
 class Color(StrEnum):
     BLACK = "BLACK"
     WHITE = "WHITE"
@@ -17,12 +18,15 @@ class Name(StrEnum):
 
 
 class ChessPiece:
-    def __init__(self, name: Name, color: Color) -> None:
-        self.name = name
+    PIECE_NAME: Name
+
+    def __init__(self, color: Color) -> None:
         self.color = color
         self.abrev: str
-
-        piece_abrev = name[0:1] if not name == Name.KNIGHT else "N"
+        
+        piece_abrev = (
+            self.PIECE_NAME[0:1] if not self.PIECE_NAME == Name.KNIGHT else "N"
+        )
         self.abrev = str(color[0:1] + piece_abrev).upper()
 
     # def check_if_valid_move(self, board_state, position):
@@ -35,30 +39,42 @@ class ChessPiece:
 
 
 class King(ChessPiece):
+    PIECE_NAME = Name.KING
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.KING, color)
+        super().__init__(color)
 
 
 class Queen(ChessPiece):
+    PIECE_NAME = Name.QUEEN
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.QUEEN, color)
+        super().__init__(color)
 
 
 class Rook(ChessPiece):
+    PIECE_NAME = Name.ROOK
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.ROOK, color)
+        super().__init__(color)
 
 
 class Bishop(ChessPiece):
+    PIECE_NAME = Name.BISHOP
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.BISHOP, color)
+        super().__init__(color)
 
 
 class Knight(ChessPiece):
+    PIECE_NAME = Name.KNIGHT
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.KNIGHT, color)
+        super().__init__(color)
 
 
 class Pawn(ChessPiece):
+    PIECE_NAME = Name.PAWN
+
     def __init__(self, color: Color) -> None:
-        super().__init__(Name.PAWN, color)
+        super().__init__(color)
