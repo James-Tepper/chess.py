@@ -1,6 +1,7 @@
+**/__pycache__/
+.env-prod
 .env
 TODO.md
 PLAN.md
 ./__pycache__
 nginx.conf
-.env-prod
