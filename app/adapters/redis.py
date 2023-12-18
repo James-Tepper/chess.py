@@ -6,16 +6,15 @@ class Redis(_Redis):
     ...
 
 
-# TODO Add optional username
 def dsn(
     scheme: str,
-    username: str,
-    password: str,
     host: str,
     port: int,
+    user: str,
+    password: str,
     database: int,
 ):
-    return f"{scheme}://{username}:{password}@{host}:{port}/{database}"
+    return f"{scheme}://{user}:{password}@{host}:{port}/{database}"
 
 
 async def from_url(url: str) -> Redis:

@@ -1,29 +1,50 @@
 import asyncio
+from typing import Callable
 
 import uvicorn
-from app import settings
-from fastapi import FastAPI, APIRouter, Response, Request
+from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from utils import FILES, LABELED_BOARD, RANKS, SQUARE_TYPE
 from utils.game import Game
 from utils.move import Move
 from utils.piece import Color
 
+from app import lifecycle, settings
+
 app = FastAPI()
 
-URL = settings.WEBSITE_URL
+WEB_URL = settings.WEBSITE_URL
+
+# Routers
+api_router = APIRouter()
+web_router = APIRouter(default_response_class=Response)
+
+# Web Host
+app.host(WEB_URL, web_router)
+
+# API Parameters
+HOSTING = f"api.{WEB_URL}" if not WEB_URL == "local" else "localhost"
+
+# API Host
+app.host(HOSTING, api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[URL],
+    allow_origins=[WEB_URL],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
-) # type: ignore
+)  # type: ignore
 
-web_router = APIRouter(default_response_class=Response)
 
-app.host(URL, web_router)
+@app.on_event("startup")
+async def startup() -> None:
+    await lifecycle.start()
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    await lifecycle.shutdown()
 
 
 def main():

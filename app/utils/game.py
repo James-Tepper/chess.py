@@ -33,7 +33,7 @@ class Game:
         rank = sqr_idxs["rank"]
         file = sqr_idxs["file"]
 
-        return self.position[rank][file] is not None
+        return self.board.position[rank][file] is not None
 
     def _is_square_occupied_by_oppenent(
         self, player: Player, square: SQUARE_TYPE
