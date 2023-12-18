@@ -8,6 +8,8 @@ APP_ENV = os.environ["APP_ENV"]
 APP_HOST = os.environ["APP_HOST"]
 APP_PORT = os.environ["APP_PORT"]
 
+WEBSITE_URL = os.environ["WEBSITE_URL"]
+
 DB_SCHEME = os.environ["DB_SCHEME"]
 DB_HOST = os.environ["DB_HOST"]
 DB_PORT = int(os.environ["DB_PORT"])
@@ -23,3 +25,6 @@ REDIS_PORT = int(os.environ["REDIS_PORT"])
 REDIS_DB = int(os.environ["REDIS_DB"])
 
 PORT = int(os.environ["PORT"])
+
+FRONTEND_ADDRESS = os.environ["FRONTEND_ADDRESS"]
+BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from enum import StrEnum
+from enum import IntEnum, StrEnum
+from typing import Callable
 
 from utils import SQUARE_TYPE
 from utils.board import ChessBoard
-from typing import Callable
+
 
 class Color(StrEnum):
     BLACK = "BLACK"
@@ -20,27 +21,52 @@ class Name(StrEnum):
     KNIGHT = "KNIGHT"
     PAWN = "PAWN"
 
-def move_validation(get_valid_moves_func: Callable):
-    def wrapper(self, board: ChessBoard, current_square: SQUARE_TYPE):
+
+class Value(IntEnum):
+    KING = None
+    QUEEN = 9
+    ROOK = 5
+    BISHOP = 3
+    KNIGHT = 3
+    PAWN = 1
+
+
+def move_validation(get_valid_moves: Callable):
+    def wrapper(self: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE):
         curr_position = board.get_index_of_square(current_square)
         curr_rank = curr_position["rank"]
         curr_file = curr_position["file"]
 
         # Check if the path to the position is clear
-        start_position = board.position[curr_rank][curr_file]
-        """
-        self.piece match and get respective movements
-        """
-        ...
+        piece_position = board.position[curr_rank][curr_file]
+
+        # Get valid move from parent method
+        unfiltered_valid_moves = get_valid_moves(self, board, current_square)
+
+        # TODO Filter out moves where the piece is pinned to the King
+
+        valid_moves = [
+            move
+            for move in unfiltered_valid_moves
+            if self.is_path_clear(board, piece_position, move)
+            and self.not_pinned_to_king(board, piece_position)
+        ]
+
+        return valid_moves
+
+    return wrapper
+
 
 class ChessPiece(ABC):
     PIECE_NAME: Name
+    PIECE_VALUE: Value
 
     def __init__(self, color: Color) -> None:
         self.color = color
-        self.value: int | None  # None for King | if temp_val is None: game over
         self.collision: bool = not self.PIECE_NAME == Name.KNIGHT
-        self.has_moved: bool = False  # Evaluating castling/en passant
+        self.has_moved: bool = (
+            False  # Evaluating castling/en passant (Pawns, Rooks, King)
+        )
         self.possible_moves: list[tuple]  # RankFile || [idx][idx]
         self.abrev: str
 
@@ -49,8 +75,8 @@ class ChessPiece(ABC):
         )
         self.abrev = str(color[0:1] + piece_abrev).upper()
 
-
-    @abstractmethod
+    @abstractmethod  # type: ignore
+    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         """
         NOTE: Must be called with move_validation
@@ -58,85 +84,85 @@ class ChessPiece(ABC):
         """
         pass
 
+    def is_path_clear(
+        self, board: ChessBoard, current_square: SQUARE_TYPE, target_square: SQUARE_TYPE
+    ):
+        # TODO implement algorithm for each piece to skip over unobtainable squares
+        # TODO implement || AND check for Knight
+        if not self.collision:
+            return True
+
+    def not_pinned_to_king(self, board: ChessBoard, current_square: SQUARE_TYPE):
+        # Find king location
+        pass
+
 
 class King(ChessPiece):
     PIECE_NAME = Name.KING
+    PIECE_VALUE = Value.KING
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self.value = None  # King doesn't have a value
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
-
-
 
 
 class Queen(ChessPiece):
     PIECE_NAME = Name.QUEEN
+    PIECE_VALUE = Value.QUEEN
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
-        self.value = 9
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
 
 
-
-
 class Rook(ChessPiece):
     PIECE_NAME = Name.ROOK
+    PIECE_VALUE = Value.ROOK
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self.value = 5
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
-
-
 
 
 class Bishop(ChessPiece):
     PIECE_NAME = Name.BISHOP
+    PIECE_VALUE = Value.BISHOP
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self.value = 3
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
-
-
 
 
 class Knight(ChessPiece):
     PIECE_NAME = Name.KNIGHT
+    PIECE_VALUE = Value.KNIGHT
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self.value = 3
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
 
 
-
-
 class Pawn(ChessPiece):
     PIECE_NAME = Name.PAWN
+    PIECE_VALUE = Value.PAWN
 
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self.value = 1
 
-    @move_validation
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         pass
-
