@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from utils import SQUARE_TYPE
+from utils import SQUARE_TYPE, Color
 from utils.board import ChessBoard
-from utils.piece import ChessPiece, Color
+from utils.piece import ChessPiece
 from utils.player import Player
 
 
 # utils/game.py
 class Game:
-    def __init__(self, current_turn: Color = Color.WHITE) -> None:
-        self.board = ChessBoard()
+    def __init__(self, board: ChessBoard, current_turn: Color = Color.WHITE) -> None:
+        self.board = board
         self.current_turn = current_turn
         self.players = {
             Color.WHITE: Player(Color.WHITE),

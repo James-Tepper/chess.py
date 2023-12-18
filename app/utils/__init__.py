@@ -1,8 +1,33 @@
+from enum import IntEnum, StrEnum
 from typing import Literal
 
-from utils.piece import Color, Name
+
+# Piece Attributes
+class Color(StrEnum):
+    BLACK = "BLACK"
+    WHITE = "WHITE"
+
+
+class Name(StrEnum):
+    KING = "KING"
+    QUEEN = "QUEEN"
+    ROOK = "ROOK"
+    BISHOP = "BISHOP"
+    KNIGHT = "KNIGHT"
+    PAWN = "PAWN"
+
+
+class Value(IntEnum):
+    KING = 0
+    QUEEN = 9
+    ROOK = 5
+    BISHOP = 3
+    KNIGHT = 3
+    PAWN = 1
+
 
 """
+NOTE
 Chess Naming Schema
 Files = Column
 Ranks = Rows
@@ -29,7 +54,7 @@ LABELED_BOARD: list[list[str]] = [
     [file + rank for file in FILES] for rank in RANKS[::-1]
 ]
 
-# LITERAL TYPES
+# Literal Types
 FILE_TYPE = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
 RANK_TYPE = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
 SQUARE_TYPE = Literal[

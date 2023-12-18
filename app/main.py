@@ -1,14 +1,10 @@
-import asyncio
-from typing import Callable
-
 import uvicorn
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from utils import FILES, LABELED_BOARD, RANKS, SQUARE_TYPE
 from utils.game import Game
-from utils.move import Move
 from utils.piece import Color
-
+from utils.board import ChessBoard
 from app import lifecycle, settings
 
 app = FastAPI()
@@ -48,28 +44,30 @@ async def shutdown() -> None:
 
 
 def main():
-    game_state = Game()
+    _board = ChessBoard()
+    game_state = Game(_board)
 
     # Board Configuration
-    board = game_state.board
-    board.setup()
+
+    game_state.board.setup()
 
     # Game loop
-    while game_state.winner is None:
-        whos_turn = (
-            Color.WHITE if game_state.current_turn == Color.WHITE else Color.BLACK
-        )
+    # while game_state.winner is None:
+    #     whos_turn = (
+    #         Color.WHITE if game_state.current_turn == Color.WHITE else Color.BLACK
+    #     )
 
-        selected_sqr = input("Select Piece: ").upper()
-        new_sqr = input("Select Destination: ")
-        if not len(selected_sqr) == 2:
-            continue
+    #     selected_sqr = input("Select Piece: ").upper()
+    #     new_sqr = input("Select Destination: ")
+    #     if not len(selected_sqr) == 2:
+    #         continue
 
-        if not selected_sqr[0] in FILES or not selected_sqr[1] in RANKS:
-            continue
+    #     if not selected_sqr[0] in FILES or not selected_sqr[1] in RANKS:
+    #         continue
 
-        game_state.players[whos_turn]
+    #     game_state.players[whos_turn]
 
 
 if "__main__" == __name__:
+    main()
     uvicorn.run(app=app, port=settings.PORT)

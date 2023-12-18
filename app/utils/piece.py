@@ -1,38 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from enum import IntEnum, StrEnum
 from typing import Callable
 
-from utils import SQUARE_TYPE
+from utils import SQUARE_TYPE, Color, Name, Value
 from utils.board import ChessBoard
 
 
-class Color(StrEnum):
-    BLACK = "BLACK"
-    WHITE = "WHITE"
-
-
-class Name(StrEnum):
-    KING = "KING"
-    QUEEN = "QUEEN"
-    ROOK = "ROOK"
-    BISHOP = "BISHOP"
-    KNIGHT = "KNIGHT"
-    PAWN = "PAWN"
-
-
-class Value(IntEnum):
-    KING = None
-    QUEEN = 9
-    ROOK = 5
-    BISHOP = 3
-    KNIGHT = 3
-    PAWN = 1
-
-
 def move_validation(get_valid_moves: Callable):
-    def wrapper(self: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE):
+    def wrapper(piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE):
         curr_position = board.get_index_of_square(current_square)
         curr_rank = curr_position["rank"]
         curr_file = curr_position["file"]
@@ -41,15 +17,15 @@ def move_validation(get_valid_moves: Callable):
         piece_position = board.position[curr_rank][curr_file]
 
         # Get valid move from parent method
-        unfiltered_valid_moves = get_valid_moves(self, board, current_square)
+        unfiltered_valid_moves = get_valid_moves(piece, board, current_square)
 
         # TODO Filter out moves where the piece is pinned to the King
 
         valid_moves = [
             move
             for move in unfiltered_valid_moves
-            if self.is_path_clear(board, piece_position, move)
-            and self.not_pinned_to_king(board, piece_position)
+            if piece.is_path_clear(board, piece_position, move)
+            and piece.not_pinned_to_king(board, piece_position)
         ]
 
         return valid_moves

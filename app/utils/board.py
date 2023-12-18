@@ -7,8 +7,10 @@ from utils import (
     RANKS,
     SQUARE_TYPE,
     STARTING_POSITION,
+    Name,
+    Color,
 )
-from utils.piece import Bishop, ChessPiece, Color, King, Knight, Name, Pawn, Queen, Rook
+from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 from utils.player import Player
 
 
@@ -18,13 +20,14 @@ class ChessBoard:
             [None for _ in range(8)] for _ in range(8)
         ]
         self.squares = LABELED_BOARD
-
+        
     def setup(self) -> None:
         piece_type: Name
         positions_by_color: dict[Color, list[str]]
         color: Color
         positions: list[str]
         square: SQUARE_TYPE
+        # piece_cls ChessPiece subclass
 
         for piece_type, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
@@ -34,6 +37,7 @@ class ChessBoard:
                     rank = sqr_idxs["rank"]
                     file = sqr_idxs["file"]
 
+                    print(type(eval(piece_type.title())))
                     piece_cls = eval(piece_type.title())
                     new_piece: ChessPiece = piece_cls(color)
 
