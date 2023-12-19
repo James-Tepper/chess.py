@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from utils import SQUARE_TYPE, Color
+from utils import SQUARE_TYPE, PieceColor
 from utils.board import ChessBoard
 from utils.piece import ChessPiece
 from utils.player import Player
@@ -8,14 +8,16 @@ from utils.player import Player
 
 # utils/game.py
 class Game:
-    def __init__(self, board: ChessBoard, current_turn: Color = Color.WHITE) -> None:
+    def __init__(
+        self, board: ChessBoard, current_turn: PieceColor = PieceColor.WHITE
+    ) -> None:
         self.board = board
         self.current_turn = current_turn
         self.players = {
-            Color.WHITE: Player(Color.WHITE),
-            Color.BLACK: Player(Color.BLACK),
+            PieceColor.WHITE: Player(PieceColor.WHITE),
+            PieceColor.BLACK: Player(PieceColor.BLACK),
         }
-        self.winner: Color | None = None
+        self.winner: PieceColor | None = None
 
         # Positive value = White Advantage | Negative value = Black Advantage
         self.material_advantage: int = 0
@@ -23,9 +25,10 @@ class Game:
 
     def switch_turn(self):
         self.current_turn = (
-            Color.WHITE if self.current_turn == Color.BLACK else Color.BLACK
+            PieceColor.WHITE
+            if self.current_turn == PieceColor.BLACK
+            else PieceColor.BLACK
         )
-
 
     def _is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:
         sqr_idxs = self.board.get_index_of_square(square)

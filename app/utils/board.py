@@ -7,8 +7,9 @@ from utils import (
     RANKS,
     SQUARE_TYPE,
     STARTING_POSITION,
-    Name,
-    Color,
+    PieceColor,
+    PieceName,
+    PieceTypes,
 )
 from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 from utils.player import Player
@@ -20,26 +21,22 @@ class ChessBoard:
             [None for _ in range(8)] for _ in range(8)
         ]
         self.squares = LABELED_BOARD
-        
+
     def setup(self) -> None:
-        piece_type: Name
-        positions_by_color: dict[Color, list[str]]
-        color: Color
+        piece: PieceName
+        positions_by_color: dict[PieceColor, list[str]]
+        color: PieceColor
         positions: list[str]
         square: SQUARE_TYPE
-        # piece_cls ChessPiece subclass
 
-        for piece_type, positions_by_color in STARTING_POSITION.items():
+        for piece, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
                 for square in positions:
                     sqr_idxs = self.get_index_of_square(square)
-
                     rank = sqr_idxs["rank"]
                     file = sqr_idxs["file"]
 
-                    print(type(eval(piece_type.title())))
-                    piece_cls = eval(piece_type.title())
-                    new_piece: ChessPiece = piece_cls(color)
+                    new_piece = PieceTypes[piece](color)
 
                     self.position[rank][file] = new_piece
 
@@ -59,7 +56,6 @@ class ChessBoard:
 
         return {"file": file, "rank": rank}
 
-
     def _get_square_of_index(self, rank: POSITION_IDX, file: POSITION_IDX) -> str:
         """
         Takes list[2 idxs] (rank, file)
@@ -67,7 +63,7 @@ class ChessBoard:
         """
         square = LABELED_BOARD[rank][file]
 
-# ================
+    # ================
 
     def _is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:
         sqr_idxs = self.get_index_of_square(square)
@@ -96,30 +92,7 @@ class ChessBoard:
             # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
         return piece if not piece.color == player.color else True
 
-
-
-
-
-
-
-
-
         return square
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def display(self):
         ...

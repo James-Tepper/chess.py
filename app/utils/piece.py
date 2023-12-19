@@ -3,18 +3,18 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from utils import Color, Name, Value, SQUARE_TYPE
+from utils import SQUARE_TYPE, PieceColor, PieceName, PieceValue
 from utils.board import ChessBoard
 from utils.move import Move
 
 
 class ChessPiece(ABC):
-    PIECE_NAME: Name
-    PIECE_VALUE: Value
+    PIECE_NAME: PieceName
+    PIECE_VALUE: PieceValue
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         self.color = color
-        self.collision: bool = not self.PIECE_NAME == Name.KNIGHT
+        self.collision: bool = not self.PIECE_NAME == PieceName.KNIGHT
         self.has_moved: bool = (
             False  # Evaluating castling/en passant (Pawns, Rooks, King)
         )
@@ -22,7 +22,7 @@ class ChessPiece(ABC):
         self.abrev: str
 
         piece_abrev = (
-            self.PIECE_NAME[0:1] if not self.PIECE_NAME == Name.KNIGHT else "N"
+            self.PIECE_NAME[0:1] if not self.PIECE_NAME == PieceName.KNIGHT else "N"
         )
         self.abrev = str(color[0:1] + piece_abrev).upper()
 
@@ -30,14 +30,14 @@ class ChessPiece(ABC):
     def piece_behavior(self):
         ...
 
-
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         piece_moves = self.piece_behavior()
         move = Move()
         # is_path_clear
-        
-        # not_pinned_to_king
 
+        # king_not_in_check
+        # if resolvable return check else mate GAMEOVER TODO implement
+        # not_pinned_to_king
         """
         NOTE: Must be called with move_validation
         TODO Check if king is directly hit by move check(color) || hit by piece moving
@@ -58,10 +58,10 @@ class ChessPiece(ABC):
 
 
 class King(ChessPiece):
-    PIECE_NAME = Name.KING
-    PIECE_VALUE = Value.KING
+    PIECE_NAME = PieceName.KING
+    PIECE_VALUE = PieceValue.KING
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):
@@ -69,10 +69,10 @@ class King(ChessPiece):
 
 
 class Queen(ChessPiece):
-    PIECE_NAME = Name.QUEEN
-    PIECE_VALUE = Value.QUEEN
+    PIECE_NAME = PieceName.QUEEN
+    PIECE_VALUE = PieceValue.QUEEN
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):
@@ -80,10 +80,10 @@ class Queen(ChessPiece):
 
 
 class Rook(ChessPiece):
-    PIECE_NAME = Name.ROOK
-    PIECE_VALUE = Value.ROOK
+    PIECE_NAME = PieceName.ROOK
+    PIECE_VALUE = PieceValue.ROOK
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):
@@ -91,10 +91,10 @@ class Rook(ChessPiece):
 
 
 class Bishop(ChessPiece):
-    PIECE_NAME = Name.BISHOP
-    PIECE_VALUE = Value.BISHOP
+    PIECE_NAME = PieceName.BISHOP
+    PIECE_VALUE = PieceValue.BISHOP
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):
@@ -102,10 +102,10 @@ class Bishop(ChessPiece):
 
 
 class Knight(ChessPiece):
-    PIECE_NAME = Name.KNIGHT
-    PIECE_VALUE = Value.KNIGHT
+    PIECE_NAME = PieceName.KNIGHT
+    PIECE_VALUE = PieceValue.KNIGHT
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):
@@ -113,10 +113,10 @@ class Knight(ChessPiece):
 
 
 class Pawn(ChessPiece):
-    PIECE_NAME = Name.PAWN
-    PIECE_VALUE = Value.PAWN
+    PIECE_NAME = PieceName.PAWN
+    PIECE_VALUE = PieceValue.PAWN
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
     def piece_behavior(self):

@@ -1,14 +1,16 @@
-from utils import SQUARE_TYPE, Color
+from utils import SQUARE_TYPE, PieceColor
+from utils.board import ChessBoard
 from utils.game import Game
 from utils.piece import ChessPiece
-from utils.board import ChessBoard
+
 
 class Move:
     def __init__(self) -> None:
         ...
-        
-        
-    def validate(self, piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE):
+
+    def validate(
+        self, piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE
+    ):
         curr_position = board.get_index_of_square(current_square)
         curr_rank = curr_position["rank"]
         curr_file = curr_position["file"]
@@ -28,7 +30,6 @@ class Move:
             and self.not_pinned_to_king(board, piece_position)
         ]
         return valid_moves
-
 
     def _check_if_legal(self) -> bool:
         ...

@@ -2,9 +2,10 @@ import uvicorn
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from utils import FILES, LABELED_BOARD, RANKS, SQUARE_TYPE
-from utils.game import Game
-from utils.piece import Color
 from utils.board import ChessBoard
+from utils.game import Game
+from utils.piece import PieceColor
+
 from app import lifecycle, settings
 
 app = FastAPI()
