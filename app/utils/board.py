@@ -48,9 +48,6 @@ class ChessBoard:
         Returns list[int] pointing to specific board position
         NOTE: Base format is File + Rank | Position array requires indexing Rank prior to File
         """
-        assert not square in LABELED_BOARD
-        assert len(square) == 2
-
         rank = 7 - RANKS.index(square[1])  # 7 for idx offset
         file = FILES.index(square[0])
 
@@ -62,8 +59,7 @@ class ChessBoard:
         Returns square (A1-H8)
         """
         square = LABELED_BOARD[rank][file]
-
-    # ================
+        return square
 
     def _is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:
         sqr_idxs = self.get_index_of_square(square)
@@ -92,7 +88,6 @@ class ChessBoard:
             # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
         return piece if not piece.color == player.color else True
 
-        return square
 
     def display(self):
         ...

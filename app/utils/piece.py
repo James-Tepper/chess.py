@@ -22,7 +22,7 @@ class ChessPiece(ABC):
         self.abrev: str
 
         piece_abrev = (
-            self.PIECE_NAME[0:1] if not self.PIECE_NAME == PieceName.KNIGHT else "N"
+            self.PIECE_NAME[:1] if not self.PIECE_NAME == PieceName.KNIGHT else "N"
         )
         self.abrev = str(color[0:1] + piece_abrev).upper()
 
