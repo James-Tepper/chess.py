@@ -32,6 +32,9 @@ class ChessBoard:
         for piece, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
                 for square in positions:
+                    if square[1] in ("3", "4", "5", "6"):
+                        continue
+
                     sqr_idxs = self.get_index_of_square(square)
                     rank = sqr_idxs["rank"]
                     file = sqr_idxs["file"]

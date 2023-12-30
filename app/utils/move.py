@@ -2,14 +2,14 @@ from utils import SQUARE_TYPE, PieceColor
 from utils.board import ChessBoard
 from utils.game import Game
 from utils.piece import ChessPiece
-
+from utils.player import Player
 
 class Move:
     def __init__(self) -> None:
         ...
 
     def validate(
-        self, piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE
+        self, player: Player, piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE
     ):
         curr_position = board.get_index_of_square(current_square)
         curr_rank = curr_position["rank"]
@@ -19,7 +19,7 @@ class Move:
         piece_position = board.position[curr_rank][curr_file]
 
         # Get valid move from parent method
-        unfiltered_valid_moves = get_valid_moves(self, board, current_square)
+        unfiltered_valid_moves = piece.get_valid_moves(self, board, current_square)
 
         # TODO Filter out moves where the piece is pinned to the King
 
@@ -31,11 +31,18 @@ class Move:
         ]
         return valid_moves
 
+    def is_check(self) -> bool:
+        ...
+
+    def not_pinned_to_king(self, piece: ChessPiece) -> bool:
+
+
+
     def _check_if_legal(self) -> bool:
         ...
         """
         Is king hit || will king be hit by movement of piece
-        
+
         """
 
     def move_piece(self, curr_sqr: SQUARE_TYPE, new_sqr: SQUARE_TYPE):
