@@ -11,6 +11,9 @@ READ_PARAMS = """
     privileges,
     password,
     country,
+    wins,
+    loses,
+    draws,
     win_rate,
     game_history,
     created_at,
@@ -24,7 +27,18 @@ class Account(TypedDict):
     password: str
     privileges: int
     country: str
-    win_rate:
+    wins: int
+    loses: int
+    draws: int
+    win_rate: float
     game_history: List[Game]
     created_at: datetime
     updated_at: datetime
+
+
+async def create(
+
+
+
+):
+    ...

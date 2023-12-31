@@ -7,10 +7,9 @@ READ_PARAMS = """
     game_id,
     white_account_id,
     black_account_id,
-
-
-
-
+    game_type,
+    start_time,
+    end_time
 """
 
 
