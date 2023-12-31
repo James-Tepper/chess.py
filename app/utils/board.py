@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, List
 
 from utils import (
     FILES,
@@ -17,16 +17,16 @@ from utils.player import Player
 
 class ChessBoard:
     def __init__(self) -> None:
-        self.position: list[list[None | ChessPiece]] = [
+        self.position: List[List[None | ChessPiece]] = [
             [None for _ in range(8)] for _ in range(8)
         ]
         self.squares = LABELED_BOARD
 
     def setup(self) -> None:
         piece: PieceName
-        positions_by_color: dict[PieceColor, list[str]]
+        positions_by_color: dict[PieceColor, List[str]]
         color: PieceColor
-        positions: list[str]
+        positions: List[str]
         square: SQUARE_TYPE
 
         for piece, positions_by_color in STARTING_POSITION.items():
@@ -48,7 +48,7 @@ class ChessBoard:
     ) -> dict[Literal["file", "rank"], int]:
         """
         Takes square (A1-H8)
-        Returns list[int] pointing to specific board position
+        Returns List[int] pointing to specific board position
         NOTE: Base format is File + Rank | Position array requires indexing Rank prior to File
         """
         rank = 7 - RANKS.index(square[1])  # 7 for idx offset
@@ -58,7 +58,7 @@ class ChessBoard:
 
     def _get_square_of_index(self, rank: POSITION_IDX, file: POSITION_IDX) -> str:
         """
-        Takes list[2 idxs] (rank, file)
+        Takes List[2 idxs] (rank, file)
         Returns square (A1-H8)
         """
         square = LABELED_BOARD[rank][file]

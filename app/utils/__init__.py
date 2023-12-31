@@ -1,5 +1,5 @@
 from enum import IntEnum, StrEnum
-from typing import Literal, Type, TypedDict
+from typing import Literal, Type, List
 from itertools import product
 from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 
@@ -11,7 +11,6 @@ PieceTypes: dict[str, Type[ChessPiece]] = {
     "Knight": Knight,
     "Pawn": Pawn,
 }
-
 
 # Piece Attributes
 class PieceColor(StrEnum):
@@ -49,7 +48,7 @@ RANKS = ["1", "2", "3", "4", "5", "6", "7", "8"]
 
 POSITION_IDX = Literal[0, 1, 2, 3, 4, 5, 6, 7]
 
-STARTING_POSITION: dict[PieceName, dict[PieceColor, list[str]]] = {
+STARTING_POSITION: dict[PieceName, dict[PieceColor, List[str]]] = {
     PieceName.KING: {PieceColor.WHITE: ["E1"], PieceColor.BLACK: ["E8"]},
     PieceName.QUEEN: {PieceColor.WHITE: ["D1"], PieceColor.BLACK: ["D8"]},
     PieceName.ROOK: {PieceColor.WHITE: ["A1", "H1"], PieceColor.BLACK: ["A8", "H8"]},
@@ -61,7 +60,7 @@ STARTING_POSITION: dict[PieceName, dict[PieceColor, list[str]]] = {
     },
 }
 
-LABELED_BOARD: list[list[str]] = [
+LABELED_BOARD: List[List[str]] = [
     [file + rank for file in FILES] for rank in RANKS[::-1]
 ]
 

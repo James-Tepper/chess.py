@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import List
 
 from utils import SQUARE_TYPE, PieceColor, PieceName, PieceValue
 from utils.board import ChessBoard
@@ -18,7 +18,7 @@ class ChessPiece(ABC):
         self.has_moved: bool = (
             False  # Evaluating castling/en passant (Pawns, Rooks, King)
         )
-        self.possible_moves: list[tuple]  # RankFile || [idx][idx]
+        self.possible_moves: List[tuple]  # RankFile || [idx][idx]
         self.abrev: str
 
         piece_abrev = (
