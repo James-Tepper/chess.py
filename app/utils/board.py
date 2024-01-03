@@ -1,4 +1,4 @@
-from typing import Literal, List
+from typing import Literal, List, Dict
 
 from utils import (
     FILES,
@@ -24,7 +24,7 @@ class ChessBoard:
 
     def setup(self) -> None:
         piece: PieceName
-        positions_by_color: dict[PieceColor, List[str]]
+        positions_by_color: Dict[PieceColor, List[str]]
         color: PieceColor
         positions: List[str]
         square: SQUARE_TYPE
@@ -45,7 +45,7 @@ class ChessBoard:
 
     def get_index_of_square(
         self, square: SQUARE_TYPE
-    ) -> dict[Literal["file", "rank"], int]:
+    ) -> Dict[Literal["file", "rank"], int]:
         """
         Takes square (A1-H8)
         Returns List[int] pointing to specific board position
@@ -61,7 +61,7 @@ class ChessBoard:
         Takes List[2 idxs] (rank, file)
         Returns square (A1-H8)
         """
-        square = LABELED_BOARD[rank][file]
+        square = self.squares[rank][file]
         return square
 
     def _is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:

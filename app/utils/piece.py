@@ -28,7 +28,8 @@ class ChessPiece(ABC):
 
     @abstractmethod
     def piece_behavior(self):
-        ...
+        pass
+
 
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         piece_moves = self.piece_behavior()

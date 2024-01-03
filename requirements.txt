@@ -2,3 +2,6 @@ asyncio
 uvicorn
 fastapi
 bcrypt
+asyncpg
+pydantic
+python-dotenv==0.19.1

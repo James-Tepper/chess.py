@@ -1,2 +1,2 @@
-DROP TABLE chess_move;
+DROP TABLE chess_moves;
 -- #TODO figure out naming schema

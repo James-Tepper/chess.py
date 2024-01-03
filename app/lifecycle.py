@@ -1,5 +1,3 @@
-from databases import Database
-
 from app import clients, settings
 from app.adapters import database, redis
 

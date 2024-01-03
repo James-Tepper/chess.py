@@ -1,9 +1,9 @@
 from enum import IntEnum, StrEnum
-from typing import Literal, Type, List
+from typing import Literal, Type, List, Dict
 from itertools import product
 from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 
-PieceTypes: dict[str, Type[ChessPiece]] = {
+PieceTypes: Dict[str, Type[ChessPiece]] = {
     "King": King,
     "Queen": Queen,
     "Rook": Rook,
@@ -48,7 +48,12 @@ RANKS = ["1", "2", "3", "4", "5", "6", "7", "8"]
 
 POSITION_IDX = Literal[0, 1, 2, 3, 4, 5, 6, 7]
 
-STARTING_POSITION: dict[PieceName, dict[PieceColor, List[str]]] = {
+FILE_TYPE = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
+RANK_TYPE = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
+
+SQUARE_TYPE = Literal[tuple(''.join(item) for item in product(FILE_TYPE, RANK_TYPE))] #type: ignore
+
+STARTING_POSITION: Dict[PieceName, Dict[PieceColor, List[SQUARE_TYPE]]] = {
     PieceName.KING: {PieceColor.WHITE: ["E1"], PieceColor.BLACK: ["E8"]},
     PieceName.QUEEN: {PieceColor.WHITE: ["D1"], PieceColor.BLACK: ["D8"]},
     PieceName.ROOK: {PieceColor.WHITE: ["A1", "H1"], PieceColor.BLACK: ["A8", "H8"]},
@@ -64,8 +69,3 @@ LABELED_BOARD: List[List[str]] = [
     [file + rank for file in FILES] for rank in RANKS[::-1]
 ]
 
-# Literal Types
-FILE_TYPE = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
-RANK_TYPE = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
-
-SQUARE_TYPE = Literal[tuple(''.join(item) for item in product(FILE_TYPE, RANK_TYPE))] #type: ignore
