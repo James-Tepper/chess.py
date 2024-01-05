@@ -124,6 +124,6 @@ async def login(login_info: Dict[str, str]) -> JSONResponse:
         content={"session": session_response, "token": token_response}
     )
 
-    response.set_cookie(key="token", value="token", httponly=True, max_age=expires_delta_seconds)
+    response.set_cookie(key="token", value=token_response, httponly=True, max_age=expires_delta_seconds)
 
     return response
