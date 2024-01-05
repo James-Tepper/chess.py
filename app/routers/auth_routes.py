@@ -1,7 +1,8 @@
 import re
-from typing import Dict
-from uuid import uuid4
+import secrets
 from datetime import datetime, timedelta
+from typing import Dict, Literal, TypedDict
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr, validator
@@ -14,6 +15,11 @@ from app.schemas import accounts, sessions
 from app.schemas.accounts import Account
 
 router = APIRouter()
+
+
+class LoginResponse(TypedDict):
+    session: SessionDTO
+    token: str
 
 
 class AccountRegistration(BaseModel):
@@ -71,7 +77,7 @@ async def register(user: AccountRegistration) -> AccountDTO:
 
 
 @router.get("/login")
-async def login(login_info: Dict[str, str]) -> SessionDTO:
+async def login(login_info: Dict[str, str]) -> LoginResponse:
     username = login_info.get("username")
     password = login_info.get("password")
 
@@ -85,9 +91,6 @@ async def login(login_info: Dict[str, str]) -> SessionDTO:
 
     assert account is not None
 
-    # get login
-    # create new session instance
-
     if not security.check_password(password, account["password"]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect Credentials"
@@ -97,14 +100,24 @@ async def login(login_info: Dict[str, str]) -> SessionDTO:
         session_id=uuid4(), account_id=account["account_id"]
     )
 
-    expires_at = datetime.now() + timedelta(hours=24)
+    expires_delta = datetime.now() + timedelta(minutes=30)
 
-    response = SessionDTO(
+    session_response = SessionDTO(
         session_id=session["session_id"],
         account_id=session["account_id"],
         created_at=session["created_at"],
-        expires_at=expires_at,
-        data=session["data"]
+        expires_at=expires_delta,
+        data=session["data"],
     )
+
+    token_secret = secrets.token_hex(32)
+
+    token_response = security.create_access_token(
+        data={"sub": account["username"]},
+        secret_key=token_secret,
+        expires_delta=expires_delta,
+    )
+
+    response: LoginResponse = {"session": session_response, "token": token_response}
 
     return response
