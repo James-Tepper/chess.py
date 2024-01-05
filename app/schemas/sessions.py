@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, TypedDict, cast
+from typing import Dict, TypedDict, cast
 from uuid import UUID
 
 from app import clients

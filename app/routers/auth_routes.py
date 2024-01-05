@@ -1,10 +1,11 @@
 import re
 import secrets
 from datetime import datetime, timedelta
-from typing import Dict, Literal, TypedDict
+from typing import Dict, TypedDict
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, validator
 
 import app.security as security
@@ -77,7 +78,7 @@ async def register(user: AccountRegistration) -> AccountDTO:
 
 
 @router.get("/login")
-async def login(login_info: Dict[str, str]) -> LoginResponse:
+async def login(login_info: Dict[str, str]) -> JSONResponse:
     username = login_info.get("username")
     password = login_info.get("password")
 
@@ -100,7 +101,8 @@ async def login(login_info: Dict[str, str]) -> LoginResponse:
         session_id=uuid4(), account_id=account["account_id"]
     )
 
-    expires_delta = datetime.now() + timedelta(minutes=30)
+    expires_delta = datetime.now() + timedelta(days=1)
+    expires_delta_seconds = int(timedelta(days=1).total_seconds())
 
     session_response = SessionDTO(
         session_id=session["session_id"],
@@ -110,14 +112,18 @@ async def login(login_info: Dict[str, str]) -> LoginResponse:
         data=session["data"],
     )
 
-    token_secret = secrets.token_hex(32)
+    secret_key = secrets.token_hex(32)
 
     token_response = security.create_access_token(
         data={"sub": account["username"]},
-        secret_key=token_secret,
+        secret_key=secret_key,
         expires_delta=expires_delta,
     )
 
-    response: LoginResponse = {"session": session_response, "token": token_response}
+    response = JSONResponse(
+        content={"session": session_response, "token": token_response}
+    )
+
+    response.set_cookie(key="token", value="token", httponly=True, max_age=expires_delta_seconds)
 
     return response
