@@ -5,10 +5,6 @@ from routers.game_routes import router as game_router
 from routers.move_routes import router as move_router
 from routers.player_routes import router as player_router
 from routers.auth_routes import router as auth_router
-from utils import FILES, LABELED_BOARD, RANKS, SQUARE_TYPE
-from utils.board import ChessBoard
-from utils.game import Game
-from utils.piece import PieceColor
 
 from app import lifecycle, settings
 
@@ -21,8 +17,6 @@ app.include_router(player_router, prefix="/players")
 app.include_router(game_router, prefix="/games")
 app.include_router(move_router, prefix="/moves")
 app.include_router(auth_router, prefix="/auth")
-
-# app.include_router(api_router, prefix="/api")
 
 
 app.add_middleware(

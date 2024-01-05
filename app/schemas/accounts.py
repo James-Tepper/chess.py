@@ -66,6 +66,22 @@ async def create(
     return cast(Account, account)
 
 
+async def fetch_by_username(
+    username: str,
+) -> Account | None:
+    account = await clients.database.fetch_one(
+        query=f"""
+            SELECT {READ_PARAMS}
+            FROM accounts
+            WHERE username = :username
+            """,
+        values={
+            "username": username,
+        },
+    )
+    return cast(Account, account) if account is not None else None
+
+
 async def check_username_availability(
     username: str,
 ) -> bool:
@@ -74,7 +90,7 @@ async def check_username_availability(
     """
     result = await clients.database.fetch_one(
         query=f"""
-            SELECT username FROM accounts
+            SELECT 1 FROM accounts
             WHERE username = :username
             """,
         values={"username": username},
@@ -93,16 +109,13 @@ async def update_win_or_loss_or_draw(
     Updates Win | Loss | Draw
     Increments Total Games
     """
-    if not win and not loss and not draw:
-        raise AssertionError
-
     params = {
         k: v
         for k, v in {"win": win, "loss": loss, "draw": draw}.items()
         if v is not None
     }
 
-    if len(params) > 1:
+    if len(params) != 1:
         raise AssertionError
 
     sql_query = "UPDATE accounts SET "
@@ -112,8 +125,11 @@ async def update_win_or_loss_or_draw(
 
     sql_query = sql_query[:-2]
 
+    params["account_id"] = account_id  # type: ignore
+
     account = await clients.database.fetch_one(
         query=f"""{sql_query}
+        WHERE account_id = :account_id
         RETURNING {READ_PARAMS}
         """,
         values=params,
