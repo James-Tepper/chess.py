@@ -10,3 +10,15 @@ class AccountDTO(BaseModel):
     draws: int
     win_rate: float
     games_played: int
+
+
+class AccountUpdateDTO(BaseModel):
+    username: str | None = None
+    email: str | None = None
+    password: str | None = None
+    country: str | None = None
+    wins: int | None = None
+    loses: int | None = None
+    draws: int | None = None
+    win_rate: float | None = None
+    games_played: int | None = None

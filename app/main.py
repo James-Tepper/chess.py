@@ -1,10 +1,10 @@
 import uvicorn
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from routers.account_routes import router as account_router
+from routers.auth_routes import router as auth_router
 from routers.game_routes import router as game_router
 from routers.move_routes import router as move_router
-from routers.player_routes import router as player_router
-from routers.auth_routes import router as auth_router
 
 from app import lifecycle, settings
 
@@ -13,10 +13,11 @@ HOSTING = f"api.{WEB_URL}" if not WEB_URL == "local" else "localhost"
 
 app = FastAPI()
 
-app.include_router(player_router, prefix="/players")
+# app.include_router(player_router, prefix="/players")
+app.include_router(account_router, prefix="/accounts")
+app.include_router(auth_router, prefix="/auth")
 app.include_router(game_router, prefix="/games")
 app.include_router(move_router, prefix="/moves")
-app.include_router(auth_router, prefix="/auth")
 
 
 app.add_middleware(

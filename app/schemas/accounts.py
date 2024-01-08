@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Literal, TypedDict, cast
+from typing import Any, Dict, List, TypedDict, cast
 
 from app import clients
 from app.privileges import Privileges
@@ -66,6 +66,39 @@ async def create(
     return cast(Account, account)
 
 
+async def fetch_all() -> List[Account]:
+    accounts = await clients.database.fetch_all(
+        query=f"""
+        SELECT {READ_PARAMS}
+        FROM accounts
+        """,
+    )
+    assert accounts is not None
+    return cast(List[Account], accounts)
+
+
+async def fetch_by_id(account_id: int) -> Account | None:
+    account = await clients.database.fetch_one(
+        query=f"""
+        SELECT {READ_PARAMS}
+        FROM accounts
+        WHERE account_id = :account_id
+        """,
+        values={
+            "account_id": account_id,
+        },
+    )
+    return cast(Account, account) if account is not None else None
+
+
+async def fetch_many(
+    privileges: int | None = None,
+    page: int = 1,
+    page_size: int = 50,
+):
+    ...
+
+
 async def fetch_by_username(
     username: str,
 ) -> Account | None:
@@ -79,6 +112,25 @@ async def fetch_by_username(
             "username": username,
         },
     )
+    return cast(Account, account) if account is not None else None
+
+
+async def update(account_id: int, updates: Dict[str, Any]) -> Account | None:
+    params = {k: v for k, v in updates.items() if v is not None}
+
+    params["account_id"] = account_id
+
+    conditions = [f"{k} = :{k}" for k in params.keys()]
+    sql_query = f"UPDATE accounts SET {', '.join(conditions)}"
+
+    account = await clients.database.fetch_one(
+        query=f"""{sql_query}
+        WHERE account_id = :account_id
+        RETURNING {READ_PARAMS}
+        """,
+        values=params,
+    )
+
     return cast(Account, account) if account is not None else None
 
 
@@ -118,14 +170,10 @@ async def update_win_or_loss_or_draw(
     if len(params) != 1:
         raise AssertionError
 
-    sql_query = "UPDATE accounts SET "
-
-    for k, v in params.items():
-        sql_query += f"{k} = :{k} + 1, "
-
-    sql_query = sql_query[:-2]
-
     params["account_id"] = account_id  # type: ignore
+
+    conditions = [f"{k} = :{k} + 1" for k in params.keys()]
+    sql_query = f"UPDATE accounts SET {', '.join(conditions)}"
 
     account = await clients.database.fetch_one(
         query=f"""{sql_query}

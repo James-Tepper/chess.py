@@ -21,7 +21,3 @@ class Game(TypedDict):
     # TODO bonus time per move
     start_time: datetime
     end_time: datetime
-
-
-
-

@@ -4,16 +4,18 @@ from datetime import datetime, timedelta
 from typing import Dict, TypedDict
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Cookie, HTTPException, status, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, validator
 
 import app.security as security
+from app import settings
 from app.dtos.accounts import AccountDTO
 from app.dtos.sessions import SessionDTO
 from app.privileges import Privileges
 from app.schemas import accounts, sessions
 from app.schemas.accounts import Account
+from app.session_access import SessionAccess
 
 router = APIRouter()
 
@@ -109,21 +111,49 @@ async def login(login_info: Dict[str, str]) -> JSONResponse:
         account_id=session["account_id"],
         created_at=session["created_at"],
         expires_at=expires_delta,
+        status=SessionAccess.GRANTED,
         data=session["data"],
     )
 
-    secret_key = secrets.token_hex(32)
-
     token_response = security.create_access_token(
-        data={"sub": account["username"]},
-        secret_key=secret_key,
+        data={
+            "sub": account["username"],
+            "account_id": str(account["account_id"]),
+            "session_id": str(session["session_id"]),
+        },
+        secret_key=settings.SECRET_KEY,
         expires_delta=expires_delta,
     )
 
     response = JSONResponse(
+        status_code=status.HTTP_200_OK,
         content={"session": session_response, "token": token_response}
     )
 
-    response.set_cookie(key="token", value=token_response, httponly=True, max_age=expires_delta_seconds)
+    response.set_cookie(
+        key="token",
+        value=token_response,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=expires_delta_seconds,
+    )
+
+    return response
+
+
+@router.delete("/logout")
+async def logout(response: Response, token: str = Cookie(...)) -> Response:
+    invalid_token = await security.invalidate_token(token)
+
+    if invalid_token:
+        response.set_cookie(
+            key="token",
+            value="",
+            httponly=True,
+            secure=True,
+            samesite="strict",
+            max_age=0
+        )
 
     return response
