@@ -1,6 +1,7 @@
 from enum import IntEnum, StrEnum
-from typing import Literal, Type, List, Dict
 from itertools import product
+from typing import Any, Dict, List, Literal, Type
+
 from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 
 PieceTypes: Dict[str, Type[ChessPiece]] = {
@@ -11,6 +12,7 @@ PieceTypes: Dict[str, Type[ChessPiece]] = {
     "Knight": Knight,
     "Pawn": Pawn,
 }
+
 
 # Piece Attributes
 class PieceColor(StrEnum):
@@ -51,7 +53,7 @@ POSITION_IDX = Literal[0, 1, 2, 3, 4, 5, 6, 7]
 FILE_TYPE = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
 RANK_TYPE = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
 
-SQUARE_TYPE = Literal[tuple(''.join(item) for item in product(FILE_TYPE, RANK_TYPE))] #type: ignore
+SQUARE_TYPE = Literal[tuple("".join(item) for item in product(FILE_TYPE, RANK_TYPE))]  # type: ignore
 
 STARTING_POSITION: Dict[PieceName, Dict[PieceColor, List[SQUARE_TYPE]]] = {
     PieceName.KING: {PieceColor.WHITE: ["E1"], PieceColor.BLACK: ["E8"]},
@@ -69,3 +71,6 @@ LABELED_BOARD: List[List[str]] = [
     [file + rank for file in FILES] for rank in RANKS[::-1]
 ]
 
+
+def filter_keys(obj: Dict[str, Any], exclude: List[str]) -> Dict[Any, Any]:
+    return {k: v for k, v in obj.items() if k not in exclude}

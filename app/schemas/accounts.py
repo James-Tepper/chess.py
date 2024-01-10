@@ -134,6 +134,21 @@ async def update(account_id: int, updates: Dict[str, Any]) -> Account | None:
     return cast(Account, account) if account is not None else None
 
 
+async def delete_by_id(
+    account_id: int,
+) -> Account | None:
+    account = await clients.database.fetch_one(
+        query=f"""
+            DELETE FROM accounts
+            WHERE account_id = :account_id
+            """,
+        values={
+            "account_id": account_id,
+        },
+    )
+    return cast(Account, account) if account is not None else None
+
+
 async def check_username_availability(
     username: str,
 ) -> bool:

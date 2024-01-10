@@ -45,7 +45,7 @@ async def invalidate_token(token: str) -> bool:
     )
 
     session = await sessions.fetch_by_id(UUID(payload["session_id"]))
-    account = await accounts.fetch_by_id(payload["account_id"])
+    account = await accounts.fetch_by_id(int(payload["account_id"]))
 
     assert session is not None
     assert account is not None

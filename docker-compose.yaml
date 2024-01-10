@@ -1,0 +1,12 @@
+version: '3'
+services:
+  chess-frontend:
+    build: /home/james/programming/projects/chess/chess.tsx
+    ports:
+      - '3000:3000'
+    depends_on:
+      - chess-backend
+  chess-backend:
+    build: /home/james/programming/projects/chess/chess.py
+    ports:
+      - '8080:8080'

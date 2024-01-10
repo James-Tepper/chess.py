@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Dict, TypedDict
 from uuid import uuid4
 
-from fastapi import APIRouter, Cookie, HTTPException, status, Response
+from fastapi import APIRouter, Cookie, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, validator
 
@@ -127,7 +127,7 @@ async def login(login_info: Dict[str, str]) -> JSONResponse:
 
     response = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={"session": session_response, "token": token_response}
+        content={"session": session_response, "token": token_response},
     )
 
     response.set_cookie(
@@ -146,14 +146,18 @@ async def login(login_info: Dict[str, str]) -> JSONResponse:
 async def logout(response: Response, token: str = Cookie(...)) -> Response:
     invalid_token = await security.invalidate_token(token)
 
-    if invalid_token:
-        response.set_cookie(
-            key="token",
-            value="",
-            httponly=True,
-            secure=True,
-            samesite="strict",
-            max_age=0
+    if not invalid_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token"
         )
+
+    response.set_cookie(
+        key="token",
+        value="",
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=0,
+    )
 
     return response
