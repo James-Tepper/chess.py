@@ -9,3 +9,4 @@ PLAN.md
 text_files
 my-config.sh
 ./certs
+.venv
