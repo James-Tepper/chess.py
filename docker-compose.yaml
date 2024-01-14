@@ -1,12 +1,21 @@
 version: '3'
 services:
-  chess-frontend:
-    build: /home/james/programming/projects/chess/chess.tsx
-    ports:
-      - '3000:3000'
-    depends_on:
-      - chess-backend
   chess-backend:
-    build: /home/james/programming/projects/chess/chess.py
+    build: /home/james/programming/projects/chess/main/backend.py
     ports:
-      - '8080:8080'
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - /home/james/programming/certs/:/etc/nginx/certs/
+    depends_on:
+      - db
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
