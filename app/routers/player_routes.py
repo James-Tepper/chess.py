@@ -1,30 +1,22 @@
-# from fastapi import APIRouter
-# from app.schemas import accounts
+from fastapi import APIRouter
+from app.schemas import accounts
+# implement redis for players
 
-# """
-# References specific game instance between two players
+router = APIRouter()
 
-# """
+@router.get("/games/{game_id}/players")
+async def get_all_players(game_id: int):
+    ...
 
-# router = APIRouter()
+@router.get("/games/{game_id}/players/{player_id}")
+async def get_player(game_id: int, player_id: int):
+    ...
 
-# @router.get("/")
-# async def get_players():
+@router.post("/games/{game_id}/players")
+async def add_player(game_id: int):
+    ...
+    # if invite or matchmaking (incorporate rating matching/algorithm?)
 
-
-# @router.get("/{player_id}")
-# async def get_player(player_id: str):
-#     ...
-
-# @router.post("/")
-# async def create_player():
-#     ...
-
-# @router.put("/{player_id}")
-# async def update_player(player_id: int):
-#     ...
-
-
-# @router.delete("/{player_id}")
-# async def delete_player(player_id: int):
-#     ...
+@router.delete("/games/{game_id}/players/{player_id}")
+async def remove_player(game_id: int, player_id: int):
+    ...

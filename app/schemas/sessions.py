@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, TypedDict, cast
+from typing import Dict, List, TypedDict, cast, Any
 from uuid import UUID
 
 from app import clients
@@ -21,7 +21,7 @@ class Session(TypedDict):
     created_at: datetime
     expires_at: datetime
     access: bool
-    data: Dict[str, str] | None
+    data: Dict[str, Any] | None
 
 
 async def create(

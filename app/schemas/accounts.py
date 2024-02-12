@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, TypedDict, cast
 
+from app.schemas import Outcome
 from app import clients
 from app.privileges import Privileges
 from app.schemas.games import Game
@@ -133,28 +134,10 @@ async def update(account_id: int, updates: Dict[str, Any]) -> Account | None:
 
     return cast(Account, account) if account is not None else None
 
-
-async def delete_by_id(
-    account_id: int,
-) -> Account | None:
-    account = await clients.database.fetch_one(
-        query=f"""
-            DELETE FROM accounts
-            WHERE account_id = :account_id
-            """,
-        values={
-            "account_id": account_id,
-        },
-    )
-    return cast(Account, account) if account is not None else None
-
-
 async def check_username_availability(
     username: str,
 ) -> bool:
-    """
-    True if username is taken
-    """
+    # Returns True if username is taken
     result = await clients.database.fetch_one(
         query=f"""
             SELECT 1 FROM accounts
@@ -168,34 +151,23 @@ async def check_username_availability(
 
 async def update_win_or_loss_or_draw(
     account_id: int,
-    win: bool | None = None,
-    loss: bool | None = None,
-    draw: bool | None = None,
+    outcome: Outcome
 ) -> Account | None:
     """
     Updates Win | Loss | Draw
     Increments Total Games
     """
-    params = {
-        k: v
-        for k, v in {"win": win, "loss": loss, "draw": draw}.items()
-        if v is not None
-    }
-
-    if len(params) != 1:
-        raise AssertionError
-
-    params["account_id"] = account_id  # type: ignore
-
-    conditions = [f"{k} = :{k} + 1" for k in params.keys()]
-    sql_query = f"UPDATE accounts SET {', '.join(conditions)}"
+    sql_query = f"UPDATE accounts SET {outcome} = {outcome} + 1"
 
     account = await clients.database.fetch_one(
-        query=f"""{sql_query}
+        query=f"""
+        {sql_query}
         WHERE account_id = :account_id
         RETURNING {READ_PARAMS}
         """,
-        values=params,
+        values={
+            "account_id": account_id,
+        },
     )
 
     return cast(Account, account) if account is not None else None
@@ -206,3 +178,28 @@ async def calculate_win_rate(
     account_id: int,
 ):
     ...
+
+async def delete_by_id(
+    account_id: int,
+) -> Account | None:
+    account = await clients.database.fetch_one(
+        query=f"""
+            SELECT 1 FROM accounts
+            WHERE account_id = :account_id
+            """,
+        values={
+            "account_id": account_id,
+        },
+    )
+
+    await clients.database.execute(
+        query=f"""
+            DELETE FROM accounts
+            WHERE account_id = :account_id
+            """,
+        values={
+            "account_id": account_id,
+        },
+    )
+
+    return cast(Account, account) if account is not None else None

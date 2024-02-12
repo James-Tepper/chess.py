@@ -1,5 +1,4 @@
 import re
-import secrets
 from datetime import datetime, timedelta
 from typing import Dict, TypedDict
 from uuid import uuid4
@@ -47,7 +46,7 @@ class AccountRegistration(BaseModel):
 @router.post("/register")
 async def register(user: AccountRegistration) -> AccountDTO:
     """
-    Used exclusively for USER registration only
+    Used exclusively for USER registration
     """
     username_available = await accounts.check_username_availability(user.username)
 
@@ -111,7 +110,7 @@ async def login(login_info: Dict[str, str]) -> JSONResponse:
         account_id=session["account_id"],
         created_at=session["created_at"],
         expires_at=expires_delta,
-        status=SessionAccess.GRANTED,
+        status=SessionAccess.GRANTED,  # implement revoke for password changes
         data=session["data"],
     )
 

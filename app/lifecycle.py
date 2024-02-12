@@ -40,8 +40,6 @@ async def _start_redis():
         )
     )
 
-    await clients.redis.connection()
-
 
 # Stop Connections
 async def _shutdown_database():
@@ -50,7 +48,5 @@ async def _shutdown_database():
 
 
 async def _shutdown_redis():
-    await clients.redis.shutdown()
+    await clients.redis.close()
     del clients.redis
-
-

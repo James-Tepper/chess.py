@@ -12,4 +12,5 @@ CREATE TABLE accounts (
     games_played INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
-)
+);
+
