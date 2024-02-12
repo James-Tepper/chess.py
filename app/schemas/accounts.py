@@ -204,7 +204,7 @@ async def delete_by_id(
     return cast(Account, account) if account is not None else None
 
 
-def get_account_info(
+def format_player_from_game(
     game_dict: Dict[str, Any], color: Literal["white", "black"]
 ) -> Account:
     return cast(
@@ -237,8 +237,8 @@ async def fetch_account_by_game_id(
 
     game_dict = dict(game)
 
-    white_account = get_account_info(game_dict, "white")
-    black_account = get_account_info(game_dict, "black")
+    white_account = format_player_from_game(game_dict, "white")
+    black_account = format_player_from_game(game_dict, "black")
 
     accounts: Dict[Literal["white", "black"], Account] = {
         "white": white_account,
