@@ -44,7 +44,7 @@ class AccountRegistration(BaseModel):
 
 
 @router.post("/register")
-async def register(user: AccountRegistration) -> AccountDTO:
+async def register(user: AccountRegistration) -> JSONResponse:
     """
     Used exclusively for USER registration
     """
@@ -63,7 +63,7 @@ async def register(user: AccountRegistration) -> AccountDTO:
         country=user.country,
     )
 
-    response = AccountDTO(
+    account_dto = AccountDTO(
         account_id=account["account_id"],
         username=account["username"],
         email_address=account["email_address"],
@@ -73,6 +73,12 @@ async def register(user: AccountRegistration) -> AccountDTO:
         draws=account["draws"],
         win_rate=account["win_rate"],
         games_played=account["games_played"],
+    )
+
+    response = JSONResponse(
+        status_code=status.HTTP_201_CREATED, content={
+            "account": account_dto
+        }
     )
 
     return response

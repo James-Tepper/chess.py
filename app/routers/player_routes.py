@@ -5,8 +5,8 @@ from app.schemas import accounts
 router = APIRouter()
 
 @router.get("/games/{game_id}/players")
-async def get_all_players(game_id: int):
-    ...
+async def get_both_players(game_id: int):
+    players = await accounts.
 
 @router.get("/games/{game_id}/players/{player_id}")
 async def get_player(game_id: int, player_id: int):

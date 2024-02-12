@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
+from fastapi.responses import JSONResponse
+from app.schemas import games
 
 router = APIRouter()
 
@@ -15,7 +17,13 @@ async def make_move(game_id: int):
 
 @router.get("/games")
 async def get_all_games():
-    ...
+    all_games = await games.fetch_all()
+
+    response = JSONResponse(
+        status_code=status.HTTP_200_OK, content={"all_games": all_games}
+    )
+
+    return response
 
 
 @router.get("/{game_id}")

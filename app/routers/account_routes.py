@@ -10,11 +10,17 @@ from app.utils import filter_keys
 
 router = APIRouter()
 
+
 @router.get("/")
 async def get_all_accounts():
     all_accounts = await accounts.fetch_all()
 
-    # return response
+    response = JSONResponse(
+        status_code=status.HTTP_200_OK, content={"all_accounts": all_accounts}
+    )
+
+    return response
+
 
 @router.get("/{account_id}")
 async def get_account(account_id: int) -> JSONResponse:

@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Any, Dict, List, TypedDict, cast
+from typing import Any, Dict, List, Literal, TypedDict, cast
 
-from app.schemas import Outcome
 from app import clients
 from app.privileges import Privileges
+from app.schemas import Outcome
 from app.schemas.games import Game
 
 READ_PARAMS = """
@@ -96,8 +96,7 @@ async def fetch_many(
     privileges: int | None = None,
     page: int = 1,
     page_size: int = 50,
-):
-    ...
+): ...
 
 
 async def fetch_by_username(
@@ -134,6 +133,7 @@ async def update(account_id: int, updates: Dict[str, Any]) -> Account | None:
 
     return cast(Account, account) if account is not None else None
 
+
 async def check_username_availability(
     username: str,
 ) -> bool:
@@ -150,8 +150,7 @@ async def check_username_availability(
 
 
 async def update_win_or_loss_or_draw(
-    account_id: int,
-    outcome: Outcome
+    account_id: int, outcome: Outcome
 ) -> Account | None:
     """
     Updates Win | Loss | Draw
@@ -176,8 +175,8 @@ async def update_win_or_loss_or_draw(
 # Calculated post game
 async def calculate_win_rate(
     account_id: int,
-):
-    ...
+): ...
+
 
 async def delete_by_id(
     account_id: int,
@@ -203,3 +202,47 @@ async def delete_by_id(
     )
 
     return cast(Account, account) if account is not None else None
+
+
+def get_account_info(
+    game_dict: Dict[str, Any], color: Literal["white", "black"]
+) -> Account:
+    return cast(
+        Account,
+        {
+            k.replace(f"{color}_", ""): v
+            for k, v in game_dict.items()
+            if k.startswith(f"{color}_")
+        },
+    )
+
+
+async def fetch_account_by_game_id(
+    game_id: int,
+) -> Dict[Literal["white", "black"], Account]:
+    game = await clients.database.fetch_one(
+        query=f"""
+        SELECT
+        black.*,
+        white.*
+        FROM games
+        INNER JOIN accounts AS black ON games.black_account_id = black.account_id
+        INNER JOIN accounts AS white ON games.white_account_id = white.account_id
+        WHERE games.game_id = :game_id
+            """,
+        values={"game_id": game_id},
+    )
+
+    assert game is not None
+
+    game_dict = dict(game)
+
+    white_account = get_account_info(game_dict, "white")
+    black_account = get_account_info(game_dict, "black")
+
+    accounts: Dict[Literal["white", "black"], Account] = {
+        "white": white_account,
+        "black": black_account,
+    }
+
+    return accounts
