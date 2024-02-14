@@ -11,7 +11,7 @@ from utils import (
     PieceName,
     PieceTypes,
 )
-from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
+from app.chess_piece import ChessPiece
 from utils.player import Player
 
 
@@ -21,6 +21,9 @@ class ChessBoard:
             [None for _ in range(8)] for _ in range(8)
         ]
         self.squares = LABELED_BOARD
+
+        # Seeds board with starting position
+        self.setup()
 
     def setup(self) -> None:
         piece: PieceName

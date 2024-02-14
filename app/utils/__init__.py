@@ -2,7 +2,7 @@ from enum import IntEnum, StrEnum
 from itertools import product
 from typing import Any, Dict, List, Literal, Type
 
-from utils.piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
+from app.chess_piece import Bishop, ChessPiece, King, Knight, Pawn, Queen, Rook
 
 PieceTypes: Dict[str, Type[ChessPiece]] = {
     "King": King,

@@ -1,7 +1,7 @@
 from utils import SQUARE_TYPE, PieceColor
 from utils.board import ChessBoard
-from utils.game import Game
-from utils.piece import ChessPiece
+from app.chess_functionality import Game
+from app.chess_piece import ChessPiece
 from utils.player import Player
 
 class Move:

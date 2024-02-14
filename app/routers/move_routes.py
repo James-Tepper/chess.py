@@ -1,14 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
+from app.dtos.piece import PieceDTO, encode_piece_for_network
 
 router = APIRouter()
 
 
 @router.get("/{game_id}/moves")
-async def get_moves(game_id: str): ...
+async def get_moves(game_id: int): ...
 
 
 @router.post("/{game_id}/moves")
-async def make_move(game_id: str): ...
+async def make_move(game_id: str, piece: PieceDTO = Body(...)):
+    encoded_piece = encode_piece_for_network(piece)
 
 
 @router.get("/{game_id}/moves/{move_id}")

@@ -1,27 +1,41 @@
-from __future__ import annotations
+from pydantic import BaseModel
 
-from utils import SQUARE_TYPE, PieceColor
-from utils.board import ChessBoard
-from utils.piece import ChessPiece
-from utils.player import Player
+from app.dtos.piece import PieceDTO
+from app.utils import SQUARE_TYPE, PieceColor
+from app.utils.board import ChessBoard
+from app.chess_piece import ChessPiece
+from app.utils.player import Player
+from app.utils import ChessPiece
+
+class MoveDTO(BaseModel):
+    # TODO add move rules
+    piece: PieceDTO
+    target_square: SQUARE_TYPE
+
+    def is_valid(self, game: Game) -> bool: ...
+
+    def apply(self, game: Game): ...
 
 
-# utils/game.py
 class Game:
     def __init__(
-        self, board: ChessBoard, current_turn: PieceColor = PieceColor.WHITE
+        self,
     ) -> None:
-        self.board = board
-        self.current_turn = current_turn
-        self.players = {
-            PieceColor.WHITE: Player(PieceColor.WHITE),
-            PieceColor.BLACK: Player(PieceColor.BLACK),
-        }
-        self.winner: PieceColor | None = None
+        self.board = ChessBoard()
+        self.current_player = PieceColor.WHITE
+        self.legal_moves = self.get_legal_moves()
+        self.in_check = {PieceColor.WHITE: False, PieceColor.BLACK: False}
+        self.can_castle = {PieceColor.WHITE: True, PieceColor.BLACK: True}
 
         # Positive value = White Advantage | Negative value = Black Advantage
         self.material_advantage: int = 0
         self.positional_advantage: float = 0.0
+
+    def get_legal_moves(self):
+        ...
+
+    def get_legal_moves_for_piece(self, piece: ChessPiece):
+        ...
 
     def switch_turn(self):
         self.current_turn = (
@@ -57,5 +71,5 @@ class Game:
             # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
         return piece if not piece.color == player.color else True
 
-    def check_for_checkmate(self):
-        ...
+
+    def check_for_checkmate(self): ...
