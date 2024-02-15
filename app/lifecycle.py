@@ -1,5 +1,3 @@
-from databases import Database
-
 from app import clients, settings
 from app.adapters import database, redis
 
@@ -42,8 +40,6 @@ async def _start_redis():
         )
     )
 
-    await clients.redis.connection()
-
 
 # Stop Connections
 async def _shutdown_database():
@@ -52,7 +48,5 @@ async def _shutdown_database():
 
 
 async def _shutdown_redis():
-    await clients.redis.shutdown()
+    await clients.redis.close()
     del clients.redis
-
-

@@ -1,4 +1,8 @@
-pygame
 asyncio
 uvicorn
+httpx
 fastapi
+bcrypt
+pydantic
+python-dotenv==0.19.1
+respx
