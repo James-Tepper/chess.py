@@ -26,5 +26,7 @@ REDIS_DB = int(os.environ["REDIS_DB"])
 
 PORT = int(os.environ["PORT"])
 
+SECRET_KEY = os.environ["SECRET_KEY"]
+
 FRONTEND_ADDRESS = os.environ["FRONTEND_ADDRESS"]
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]

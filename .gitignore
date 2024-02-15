@@ -1,7 +1,15 @@
 **/__pycache__/
 .env-prod
 .env
-TODO.md
-PLAN.md
 ./__pycache__
 nginx.conf
+<<<<<<< HEAD
+=======
+venv
+TODO.md
+PLAN.md
+text_files
+my-config.sh
+**/certs
+.venv
+>>>>>>> test
