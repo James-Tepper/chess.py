@@ -3,7 +3,7 @@ from typing import List
 from app.utils import SQUARE_TYPE
 from fastapi import APIRouter, Body, HTTPException, status
 from fastapi.responses import JSONResponse
-
+from app.dtos.accounts import AccountDTO
 from app.dtos.piece import (
     PieceDTO,
     encode_piece_for_network,
@@ -15,6 +15,11 @@ from app.schemas import games
 
 router = APIRouter()
 
+
+@router.post("/{game_id}")
+async def create_game(game_id: int, players: list[AccountDTO]):
+    assert not len(players) == 2
+    
 
 @router.get("/{game_id}")
 async def get_moves(game_id: int): ...
@@ -43,8 +48,8 @@ async def get_board_position(game_id: int):
     return response
 
 
-@router.post("/{game_id}/moves")
-async def make_move(game_id: int, move: Move): ...
+# @router.post("/{game_id}/moves")
+# async def make_move(game_id: int, move: Move): ...
 
 
 @router.get("/games")
