@@ -3,9 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List
 
-from utils import SQUARE_TYPE, PieceColor, PieceName, PieceValue
-from utils.board import ChessBoard
-from utils.move import Move
+from app.chess_functionality import ChessBoard, Move
+from app.utils.constants import SQUARE_TYPE, PieceColor, PieceName, PieceValue
 
 
 class ChessPiece(ABC):
@@ -16,7 +15,7 @@ class ChessPiece(ABC):
         self.color = color
         self.collision: bool = not self.PIECE_NAME == PieceName.KNIGHT
         self.has_moved: bool = (
-            False  # Evaluating castling/en passant (Pawns, Rooks, King)
+            False  # Evaluating castling/en passant/2 square pawn move (Pawns, Rooks, King)
         )
         self.possible_moves: List[tuple]  # RankFile || [idx][idx]
         self.abrev: str
@@ -24,12 +23,12 @@ class ChessPiece(ABC):
         piece_abrev = (
             self.PIECE_NAME[:1] if not self.PIECE_NAME == PieceName.KNIGHT else "N"
         )
-        self.abrev = str(color[0:1] + piece_abrev).upper()
+
+        self.abrev = str(color[:1] + piece_abrev).upper()
 
     @abstractmethod
     def piece_behavior(self):
         pass
-
 
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         piece_moves = self.piece_behavior()

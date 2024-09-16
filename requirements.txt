@@ -6,3 +6,4 @@ bcrypt
 pydantic
 python-dotenv==0.19.1
 respx
+pytest

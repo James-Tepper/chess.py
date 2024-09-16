@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Tuple
 
-from utils import (
+from app.chess_piece import ChessPiece
+from app.dtos.piece import PieceDTO
+from app.utils.constants import (
     FILE_TYPE,
     FILES,
     LABELED_BOARD,
@@ -11,14 +13,12 @@ from utils import (
     RANKS,
     SQUARE_TYPE,
     STARTING_POSITION,
+    ChessPiece,
     PieceColor,
     PieceName,
     PieceTypes,
+    SquareStatus,
 )
-
-from app.chess_piece import ChessPiece
-from app.dtos.piece import PieceDTO
-from app.utils import SQUARE_TYPE, ChessPiece, PieceColor
 
 
 class Game:
@@ -26,14 +26,82 @@ class Game:
         self,
     ) -> None:
         self.board = ChessBoard()
-        self.current_player = PieceColor.WHITE
+        self.bit_board = BitBoard()
+        self.current_turn = PieceColor.WHITE
         self.legal_moves = self.get_legal_moves()
         self.in_check = {PieceColor.WHITE: False, PieceColor.BLACK: False}
+
+        # TODO can_castle 4 bools for each side
         self.can_castle = {PieceColor.WHITE: True, PieceColor.BLACK: True}
 
         # Positive value = White Advantage | Negative value = Black Advantage
         self.material_advantage: int = 0
         self.positional_advantage: float = 0.0
+
+    def initialize_bitboard(self) -> None:
+        self.piece_bitboards = {
+            PieceName.PAWN: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+            PieceName.ROOK: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+            PieceName.KNIGHT: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+            PieceName.BISHOP: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+            PieceName.QUEEN: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+            PieceName.KING: {
+                PieceColor.WHITE: BitBoard(),
+                PieceColor.BLACK: BitBoard(),
+            },
+        }
+
+        piece_order: Tuple = (
+            PieceName.ROOK,
+            PieceName.KNIGHT,
+            PieceName.BISHOP,
+            PieceName.QUEEN,
+            PieceName.KING,
+            PieceName.BISHOP,
+            PieceName.KNIGHT,
+            PieceName.ROOK,
+        )
+
+        # Populating Pawns
+        for file in range(8):
+
+            curr_file = chr(file + ord("A")).upper()
+            assert isinstance(curr_file, FILE_TYPE)
+
+            self.piece_bitboards[PieceName.PAWN][PieceColor.WHITE].set_piece(
+                BoardSquare(curr_file, "2")
+            )
+            self.piece_bitboards[PieceName.PAWN][PieceColor.BLACK].set_piece(
+                BoardSquare(curr_file, "7")
+            )
+
+        # Populating Other Pieces
+        for file, piece in enumerate(piece_order):
+
+            curr_file = chr(file + ord("A")).upper()
+            assert isinstance(curr_file, FILE_TYPE)
+
+            self.piece_bitboards[piece][PieceColor.WHITE].set_piece(
+                BoardSquare(curr_file, "1")
+            )
+            self.piece_bitboards[piece][PieceColor.BLACK].set_piece(
+                BoardSquare(curr_file, "8")
+            )
 
     def get_legal_moves(self) -> Dict[PieceName, SQUARE_TYPE]: ...
 
@@ -52,7 +120,7 @@ class Game:
         rank = sqr_idxs["rank"]
         file = sqr_idxs["file"]
 
-        return self.board.position[rank][file] is not None
+        return self.board.active_board[rank][file] is not None
 
     def _is_square_occupied_by_oppenent(
         self, player: Player, square: SQUARE_TYPE
@@ -65,7 +133,7 @@ class Game:
         rank = sqr_idxs["rank"]
         file = sqr_idxs["file"]
 
-        piece = self.board.position[rank][file]
+        piece = self.board.active_board[rank][file]
 
         # TODO Maybe fix: Currently returns either Piece on specific square or True (meaning opp is on square)
         if not isinstance(piece, ChessPiece):
@@ -99,21 +167,24 @@ class BitBoard:
 
 class BoardSquare:
     def __init__(self, file: FILE_TYPE, rank: RANK_TYPE) -> None:
-        self.file = file
-        self.rank = rank
+        self.file = ord(file.upper()) - ord("A")
+        self.rank = int(rank) - 1
 
     def to_int(self) -> int:
-        file_num = ord(self.file) - ord("A")
-        rank_num = int(self.rank) - 1
-
-        return rank_num * 8 + file_num
+        """
+        Converts each board square to an integer between 0 and 63.
+        The bottom left square (A1) maps to 0 and the top right square (H8) maps to 63.
+        Mapping is incremented horizontally from left to right, bottom to top.
+        """
+        return (7 - self.rank) * 8 + self.file
 
 
 class ChessBoard:
     def __init__(self) -> None:
-        self.position: List[List[None | ChessPiece]] = [
+        self.board = BitBoard()
+        self.active_board: List[List[None | ChessPiece]] = [
             [None for _ in range(8)] for _ in range(8)
-        ]
+        ]  # TODO refactor to replace with bitboard
         self.squares = LABELED_BOARD
 
         # Seeds board with starting position
@@ -128,7 +199,8 @@ class ChessBoard:
 
         for piece, positions_by_color in STARTING_POSITION.items():
             for color, positions in positions_by_color.items():
-                for square in positions:
+                for square in positions:  # type:ignore
+                    assert isinstance(square, SQUARE_TYPE)
                     if square[1] in ("3", "4", "5", "6"):
                         continue
 
@@ -138,7 +210,7 @@ class ChessBoard:
 
                     new_piece = PieceTypes[piece](color)
 
-                    self.position[rank][file] = new_piece
+                    self.active_board[rank][file] = new_piece
 
     def get_index_of_square(
         self, square: SQUARE_TYPE
@@ -168,26 +240,40 @@ class ChessBoard:
         rank = sqr_idxs["rank"]
         file = sqr_idxs["file"]
 
-        return self.position[rank][file] is not None
+        return self.active_board[rank][file] is not None
 
-    def _is_square_occupied_by_oppenent(
+    def _is_the_square_occupied(
         self, player: Player, square: SQUARE_TYPE
-    ) -> bool | ChessPiece:
+    ) -> SquareStatus:
         """
-        T/F or Piece if belongs to player who's moving
+        None if Player's Piece
         """
+
+        """
+        TODO check ret case in following function to retrieve piece info
+        """
+
         sqr_idxs = self.get_index_of_square(square)
 
         rank = sqr_idxs["rank"]
         file = sqr_idxs["file"]
 
-        piece = self.position[rank][file]
+        square_occupacy = (
+            self.active_board[rank][file]
+            if isinstance(self.active_board[rank][file], ChessPiece)
+            else SquareStatus.EMPTY
+        )
 
-        # TODO Maybe fix: Currently returns either Piece on specific square or True (meaning opp is on square)
-        if not isinstance(piece, ChessPiece):
-            return False
-            # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
-        return piece if not piece.color == player.color else True
+        if not square_occupacy:
+            return SquareStatus.EMPTY
+
+        assert type(square_occupacy) is ChessPiece
+
+        if square_occupacy.color == player.color:
+            return SquareStatus.OCCUPIED_BY_OPPONENT_PIECE
+
+        else:
+            return SquareStatus.OCCUPIED_BY_OWN_PIECE
 
 
 class Player:

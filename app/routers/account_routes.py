@@ -6,9 +6,14 @@ from fastapi.responses import JSONResponse
 import app.security as security
 from app.dtos.accounts import AccountDTO, AccountUpdateDTO
 from app.schemas import accounts
-from app.utils import filter_keys
+from app import logger
 
 router = APIRouter()
+
+
+
+def filter_keys(obj: Dict[str, Any], exclude: List[str]) -> Dict[Any, Any]:
+    return {k: v for k, v in obj.items() if k not in exclude}
 
 
 @router.get("/")
@@ -69,4 +74,11 @@ async def update_account(
 
 @router.delete("/{account_id}")
 async def delete_account(account_id: int):
-    return await accounts.delete_by_id(account_id)
+    try:
+        await accounts.delete_by_id(account_id)
+    except: # implement for all errors (as syntax)
+        logger.info(
+            "Account was unable to be deleted",
+            extra=account_id
+            )
+        return False
