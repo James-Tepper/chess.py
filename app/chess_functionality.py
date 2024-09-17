@@ -30,9 +30,11 @@ class Game:
         self.current_turn = PieceColor.WHITE
         self.legal_moves = self.get_legal_moves()
         self.in_check = {PieceColor.WHITE: False, PieceColor.BLACK: False}
+        self.king_moved = {PieceColor.WHITE: False, PieceColor.BLACK: False}
+        # TODO implement way to check rook moved (for castling)
 
         # TODO can_castle 4 bools for each side
-        self.can_castle = {PieceColor.WHITE: True, PieceColor.BLACK: True}
+        self.can_castle = {PieceColor.WHITE: False, PieceColor.BLACK: False}
 
         # Positive value = White Advantage | Negative value = Black Advantage
         self.material_advantage: int = 0
@@ -283,34 +285,83 @@ class Player:
         self.color = color
 
 
+# TODO reassess implemnation to allow for 1 instance (make more dynamic)
 class Move:
+    # TODO __init__ method to dynamically generate moves at runtime
     # TODO add move rules
-    piece: PieceDTO
-    current_square: SQUARE_TYPE
-    target_square: SQUARE_TYPE
+    def is_within_board(self, square: SQUARE_TYPE):
+        file, rank = square
 
-    def is_valid(self, game: Game) -> bool: ...
+        return file in FILES and rank in RANKS
 
-    def apply(self, game: Game):
+    def is_move_legal_for_piece(
+        self, piece: ChessPiece, current_square: SQUARE_TYPE, target_square: SQUARE_TYPE
+    ) -> bool:
+
+        current_file = FILES.index(current_square[0])
+        current_rank = 7 - RANKS.index(current_square[1])
+
+        target_file = FILES.index(target_square[0])
+        target_rank = 7 - RANKS.index(target_square[1])
+
+        match piece.PIECE_NAME:
+            case PieceName.PAWN:
+                if piece.color == PieceColor.WHITE:
+                    return target_rank > current_rank
+                elif piece.color == PieceColor.BLACK:
+                    return target_rank < current_rank
+            case PieceName.KING:
+                ...
+            case PieceName.QUEEN:
+                ...
+            case PieceName.ROOK:
+                ...
+            case PieceName.BISHOP:
+                ...
+            case PieceName.KNIGHT:
+                ...
+            case _:
+                raise AssertionError("Unkown Piece Type")
+
+    # TODO finish method
+    def is_valid(
+        self,
+        game: Game,
+        piece: ChessPiece,
+        current_square: SQUARE_TYPE,
+        target_square: SQUARE_TYPE,
+    ) -> bool:
+        if not self.is_within_board(target_square):
+            return False
+
+        if not self.is_move_legal_for_piece(piece, current_square, target_square):
+            return False
+
+        return True
+
+    def apply(
+        self,
+        game: Game,
+        piece: ChessPiece,
+        current_square: SQUARE_TYPE,
+        target_square: SQUARE_TYPE,
+    ):
         # update 'physical board'
         # update bitboard
-        if not self.is_valid(game):
+        if not self.is_valid(game, current_square, target_square):
             return False
             #!!TODO implement is_valid checker for bitboard
 
-        current_file = FILES.index(self.current_square[0])
-        current_rank = 7 - RANKS.index(self.current_square[1])
+        current_file = FILES.index(current_square[0])
+        current_rank = 7 - RANKS.index(current_square[1])
 
-        target_file = FILES.index(self.target_square[0])
-        target_rank = 7 - RANKS.index(self.target_square[1])
-
+        target_file = FILES.index(target_square[0])
+        target_rank = 7 - RANKS.index(target_square[1])
 
         # Update active board
-        game.board.active_board[target_rank][
-            target_file
-        ] = self.piece  # TODO fix late #type:ignore
+        game.board.active_board[target_rank][target_file] = piece
 
-        #TODO maybe implement generator between active board and bitboard for more efficiency (probably not necessary)
+        # TODO maybe implement generator between active board and bitboard for more efficiency (probably not necessary)
 
         if target_rank not in RANKS or current_rank not in RANKS:
             return False
@@ -329,6 +380,5 @@ class Move:
         if game.board.bit_board.is_square_occupied(bit_board_target_square):
             game.board.bit_board.remove_piece(bit_board_target_square)
 
-
-        #TODO double check implementation
+        # TODO double check implementation
         game.board.bit_board.set_piece(bit_board_target_square)
