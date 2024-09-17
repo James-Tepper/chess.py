@@ -144,6 +144,7 @@ class Game:
     def check_for_checkmate(self): ...
 
 
+
 class BitBoard:
     def __init__(self) -> None:
         self.b_board = 0
@@ -181,7 +182,7 @@ class BoardSquare:
 
 class ChessBoard:
     def __init__(self) -> None:
-        self.board = BitBoard()
+        self.bit_board = BitBoard()
         self.active_board: List[List[None | ChessPiece]] = [
             [None for _ in range(8)] for _ in range(8)
         ]  # TODO refactor to replace with bitboard
@@ -286,8 +287,31 @@ class Player:
 class Move:
     # TODO add move rules
     piece: PieceDTO
+    current_square: SQUARE_TYPE
     target_square: SQUARE_TYPE
 
     def is_valid(self, game: Game) -> bool: ...
 
-    def apply(self, game: Game): ...
+    def apply(self, game: Game):
+        #update 'physical board'
+        #update bitboard
+        if not self.is_valid(game):
+            return False
+
+        current_file = FILES.index(self.current_square[0])
+        current_rank = 7 - RANKS.index(self.current_square[1])
+
+        target_file = FILES.index(self.target_square[0])
+        target_rank = 7 - RANKS.index(self.target_square[1])
+
+
+
+        #TODO fix
+        # game.board.active_board[target_rank][target_file] = self.piece # TODO fix late #type:ignore
+
+
+
+        # bit_board_current_square = BoardSquare(file=target_file, rank=target_rank)
+
+        # game.board.bit_board.move_piece(current_square=self.current_square, new_square=self.target_square)
+
