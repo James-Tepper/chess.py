@@ -144,7 +144,6 @@ class Game:
     def check_for_checkmate(self): ...
 
 
-
 class BitBoard:
     def __init__(self) -> None:
         self.b_board = 0
@@ -293,10 +292,11 @@ class Move:
     def is_valid(self, game: Game) -> bool: ...
 
     def apply(self, game: Game):
-        #update 'physical board'
-        #update bitboard
+        # update 'physical board'
+        # update bitboard
         if not self.is_valid(game):
             return False
+            #!!TODO implement is_valid checker for bitboard
 
         current_file = FILES.index(self.current_square[0])
         current_rank = 7 - RANKS.index(self.current_square[1])
@@ -305,13 +305,30 @@ class Move:
         target_rank = 7 - RANKS.index(self.target_square[1])
 
 
+        # Update active board
+        game.board.active_board[target_rank][
+            target_file
+        ] = self.piece  # TODO fix late #type:ignore
 
-        #TODO fix
-        # game.board.active_board[target_rank][target_file] = self.piece # TODO fix late #type:ignore
+        #TODO maybe implement generator between active board and bitboard for more efficiency (probably not necessary)
+
+        if target_rank not in RANKS or current_rank not in RANKS:
+            return False
+
+        if target_file not in FILES or current_file not in FILES:
+            return False
+
+        bit_board_target_square = BoardSquare(file=target_file, rank=target_rank)
+        bit_board_current_square = BoardSquare(file=current_file, rank=current_rank)
+
+        # Update bitboard
+        game.board.bit_board.move_piece(
+            current_square=bit_board_current_square, new_square=bit_board_target_square
+        )
+
+        if game.board.bit_board.is_square_occupied(bit_board_target_square):
+            game.board.bit_board.remove_piece(bit_board_target_square)
 
 
-
-        # bit_board_current_square = BoardSquare(file=target_file, rank=target_rank)
-
-        # game.board.bit_board.move_piece(current_square=self.current_square, new_square=self.target_square)
-
+        #TODO double check implementation
+        game.board.bit_board.set_piece(bit_board_target_square)
