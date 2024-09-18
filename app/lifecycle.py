@@ -1,5 +1,6 @@
 from app import clients, settings
-from app.adapters import database, redis
+from app.adapters import database
+from app.adapters import config
 
 
 async def start():
@@ -29,8 +30,8 @@ async def _start_database():
 
 
 async def _start_redis():
-    clients.redis = await redis.from_url(
-        url=redis.dsn(
+    clients.redis = await config.from_url(
+        url=config.dsn(
             scheme=settings.REDIS_SCHEME,
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
@@ -41,12 +42,11 @@ async def _start_redis():
     )
 
 
-# Stop Connections
 async def _shutdown_database():
     await clients.database.disconnect()
     del clients.database
 
 
 async def _shutdown_redis():
-    await clients.redis.close()
+    clients.redis.close()
     del clients.redis

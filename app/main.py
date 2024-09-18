@@ -6,13 +6,21 @@ from routers.auth_routes import router as auth_router
 from routers.game_routes import router as game_router
 from routers.move_routes import router as move_router
 from routers.player_routes import router as player_router
-
+from contextlib import asynccontextmanager
 from app import lifecycle, settings
 
 WEB_URL = settings.WEBSITE_URL
 HOSTING = f"api.{WEB_URL}" if not WEB_URL == "local" else "localhost"
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await lifecycle.start()
+    yield
+    await lifecycle.shutdown()
+
+
+app = FastAPI(lifespan=lifespan)
 
 # app.include_router(player_router, prefix="/players")
 app.include_router(account_router, prefix="/accounts")
@@ -29,17 +37,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
-
-
-@app.on_event("startup")
-async def startup() -> None:
-    await lifecycle.start()
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    await lifecycle.shutdown()
-
 
 if __name__ == "__main__":
     uvicorn.run(app=app, host=HOSTING, port=settings.PORT)

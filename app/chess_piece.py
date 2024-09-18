@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List
 
-from app.chess_functionality import ChessBoard, Move
+from app.utils.functionality import ChessBoard, Move
 from app.utils.constants import SQUARE_TYPE, PieceColor, PieceName, PieceValue
 
 

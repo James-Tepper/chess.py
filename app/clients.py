@@ -1,5 +1,6 @@
 from app.adapters.database import Database
-from app.adapters.redis import Redis
+from redis import Redis
 
-database: Database
 redis: Redis
+database: Database
+# redis: Redis

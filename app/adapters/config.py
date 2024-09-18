@@ -1,9 +1,6 @@
 import redis.asyncio
-from redis.asyncio import Redis as _Redis
-
-
-class Redis(_Redis):
-    ...
+import redis
+import settings
 
 
 def dsn(
@@ -17,5 +14,5 @@ def dsn(
     return f"{scheme}://{user}:{password}@{host}:{port}/{database}"
 
 
-async def from_url(url: str) -> Redis:
+async def from_url(url: str):
     return await redis.asyncio.from_url(url)

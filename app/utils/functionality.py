@@ -21,6 +21,7 @@ from app.utils.constants import (
 )
 
 
+# Game class
 class Game:
     def __init__(
         self,
@@ -146,41 +147,7 @@ class Game:
     def check_for_checkmate(self): ...
 
 
-class BitBoard:
-    def __init__(self) -> None:
-        self.b_board = 0
-
-    def set_piece(self, square: BoardSquare) -> None:
-        position = square.to_int()
-        self.b_board |= 1 << position
-
-    def remove_piece(self, square: BoardSquare) -> None:
-        position = square.to_int()
-        self.b_board &= ~(1 << position)
-
-    def move_piece(self, current_square: BoardSquare, new_square: BoardSquare):
-        self.remove_piece(current_square)
-        self.set_piece(new_square)
-
-    def is_square_occupied(self, square: BoardSquare):
-        position = square.to_int()
-        return (self.b_board & (1 << position)) != 0
-
-
-class BoardSquare:
-    def __init__(self, file: FILE_TYPE, rank: RANK_TYPE) -> None:
-        self.file = ord(file.upper()) - ord("A")
-        self.rank = int(rank) - 1
-
-    def to_int(self) -> int:
-        """
-        Converts each board square to an integer between 0 and 63.
-        The bottom left square (A1) maps to 0 and the top right square (H8) maps to 63.
-        Mapping is incremented horizontally from left to right, bottom to top.
-        """
-        return (7 - self.rank) * 8 + self.file
-
-
+# Board classes
 class ChessBoard:
     def __init__(self) -> None:
         self.bit_board = BitBoard()
@@ -244,9 +211,7 @@ class ChessBoard:
 
         return self.active_board[rank][file] is not None
 
-    def _is_the_square_occupied(
-        self, player: Player, square: SQUARE_TYPE
-    ) -> SquareStatus:
+    def _is_the_square_occupied(self, mover, square: SQUARE_TYPE) -> SquareStatus:
         """
         None if Player's Piece
         """
@@ -278,16 +243,92 @@ class ChessBoard:
             return SquareStatus.OCCUPIED_BY_OWN_PIECE
 
 
+class BitBoard:
+    def __init__(self) -> None:
+        self.b_board = 0
+
+    def set_piece(self, square: BoardSquare) -> None:
+        position = square.to_int()
+        self.b_board |= 1 << position
+
+    def remove_piece(self, square: BoardSquare) -> None:
+        position = square.to_int()
+        self.b_board &= ~(1 << position)
+
+    def move_piece(self, current_square: BoardSquare, new_square: BoardSquare):
+        self.remove_piece(current_square)
+        self.set_piece(new_square)
+
+    def is_square_occupied(self, square: BoardSquare):
+        position = square.to_int()
+        return (self.b_board & (1 << position)) != 0
+
+
+class BoardSquare:
+    def __init__(self, file: FILE_TYPE, rank: RANK_TYPE) -> None:
+        self.file = ord(file.upper()) - ord("A")
+        self.rank = int(rank) - 1
+
+    def to_int(self) -> int:
+        """
+        Converts each board square to an integer between 0 and 63.
+        The bottom left square (A1) maps to 0 and the top right square (H8) maps to 63.
+        Mapping is incremented horizontally from left to right, bottom to top.
+        """
+        return (7 - self.rank) * 8 + self.file
+
+
+# Player Class
 class Player:
     def __init__(
         self, color: Literal[PieceColor.WHITE, PieceColor.BLACK]
     ) -> None:  # TODO DO
         self.color = color
+        self.move = Move(self.color)
 
 
+# Move Class
 # TODO reassess implemnation to allow for 1 instance (make more dynamic)
 class Move:
+    def __init__(self, color) -> None:
+        self.color = color
+        self.turn = True if self.color == PieceColor.WHITE else False
+
     # TODO __init__ method to dynamically generate moves at runtime
+    def generate_valid_moves(self) -> List[Dict[ChessPiece, List[SQUARE_TYPE]]] | None:
+        '''
+        Returns Square of piece
+
+        '''
+        if not self.turn:
+            #TODO implement turn rotation
+            raise AttributeError("Didn't implement turn rotation")
+
+
+
+    # def get_pawn_moves(board_state, position):
+    #     ...
+
+
+    # def get_rook_moves(board_state, position):
+    #     ...
+
+
+    # def get_knight_moves(board_state, position):
+    #     ...
+
+
+    # def get_bishop_moves(board_state, position):
+    #     ...
+
+
+    # def get_queen_moves(board_state, position):
+    #     ...
+
+
+    # def get_king_moves(board_state, position):
+    #     ...
+
     # TODO add move rules
     def is_within_board(self, square: SQUARE_TYPE):
         file, rank = square
@@ -382,3 +423,113 @@ class Move:
 
         # TODO double check implementation
         game.board.bit_board.set_piece(bit_board_target_square)
+
+
+# class Move:
+#     def __init__(self) -> None:
+#         ...
+
+#     def validate(
+#         self, player: Player, piece: ChessPiece, board: ChessBoard, current_square: SQUARE_TYPE
+#     ):
+#         curr_position = board.get_index_of_square(current_square)
+#         curr_rank = curr_position["rank"]
+#         curr_file = curr_position["file"]
+
+#         # Check if the path to the position is clear
+#         piece_position = board.position[curr_rank][curr_file]
+
+#         # Get valid move from parent method
+#         unfiltered_valid_moves = piece.get_valid_moves(self, board, current_square)
+
+#         # TODO Filter out moves where the piece is pinned to the King
+
+#         valid_moves = [
+#             move
+#             for move in unfiltered_valid_moves
+#             if self.is_path_clear(board, piece_position, move)
+#             and self.not_pinned_to_king(board, piece_position)
+#         ]
+#         return valid_moves
+
+#     def is_check(self) -> bool:
+#         ...
+
+#     def not_pinned_to_king(self, piece: ChessPiece) -> bool:
+
+
+#     def _check_if_legal(self) -> bool:
+#         ...
+#         """
+#         Is king hit || will king be hit by movement of piece
+
+#         """
+
+#     def move_piece(self, curr_sqr: SQUARE_TYPE, new_sqr: SQUARE_TYPE):
+#         # check_if_legal()
+#         ...
+
+
+# # TODO Implement checker if king is directly hit by move check(color)
+
+
+# class MoveHistory:
+#     def __init__(self) -> None:
+#         self.history = {}
+
+
+# # General Move Legality
+
+# # def get_moves(board_state, position):
+# #     ...
+
+
+# def get_pawn_moves(board_state, position):
+#     ...
+
+
+# def get_rook_moves(board_state, position):
+#     ...
+
+
+# def get_knight_moves(board_state, position):
+#     ...
+
+
+# def get_bishop_moves(board_state, position):
+#     ...
+
+
+# def get_queen_moves(board_state, position):
+#     ...
+
+
+# def get_king_moves(board_state, position):
+#     ...
+
+
+# # Castling
+# def can_castle(board_state, color, side):
+#     ...
+
+
+# def perform_castle(board_state, color, side):
+#     ...
+
+
+# # En Passant
+# def can_en_passant(board_state, from_position, to_position):
+#     ...
+
+
+# def perform_en_passant(board_state, from_position, to_position):
+#     ...
+
+
+# # Pawn Promotion
+# def can_promote_pawn(board_state, position):
+#     ...
+
+
+# def promote_pawn(board_state, position, new_piece):
+#     ...
