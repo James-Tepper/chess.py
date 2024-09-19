@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Tuple
+from typing import Dict, List, Literal, Tuple, cast
 
 from app.chess_piece import ChessPiece
 from app.dtos.piece import PieceDTO
@@ -18,6 +18,7 @@ from app.utils.constants import (
     PieceName,
     PieceTypes,
     SquareStatus,
+    StartingRank,
 )
 
 
@@ -117,7 +118,7 @@ class Game:
             else PieceColor.BLACK
         )
 
-    def _is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:
+    def is_square_occupied(self, square: SQUARE_TYPE) -> bool | ChessPiece:
         sqr_idxs = self.board.get_index_of_square(square)
 
         rank = sqr_idxs["rank"]
@@ -125,9 +126,9 @@ class Game:
 
         return self.board.active_board[rank][file] is not None
 
-    def _is_square_occupied_by_oppenent(
-        self, player: Player, square: SQUARE_TYPE
-    ) -> bool | ChessPiece:
+    def is_square_occupied_by_oppenent(
+        self, color: PieceColor, square: SQUARE_TYPE
+    ) -> bool:
         """
         T/F || Piece if belongs to player who's moving
         """
@@ -142,7 +143,7 @@ class Game:
         if not isinstance(piece, ChessPiece):
             return False
             # Returns Piece object if it's Player's own piece else TRUE -> refering to square is occupied
-        return piece if not piece.color == player.color else True
+        return not piece.color == color
 
     def check_for_checkmate(self): ...
 
@@ -211,12 +212,11 @@ class ChessBoard:
 
         return self.active_board[rank][file] is not None
 
-    def _is_the_square_occupied(self, mover, square: SQUARE_TYPE) -> SquareStatus:
+    def _is_the_square_occupied(
+        self, player: Player, square: SQUARE_TYPE
+    ) -> SquareStatus:
         """
         None if Player's Piece
-        """
-
-        """
         TODO check ret case in following function to retrieve piece info
         """
 
@@ -234,7 +234,7 @@ class ChessBoard:
         if not square_occupacy:
             return SquareStatus.EMPTY
 
-        assert type(square_occupacy) is ChessPiece
+        assert isinstance(square_occupacy, ChessPiece)
 
         if square_occupacy.color == player.color:
             return SquareStatus.OCCUPIED_BY_OPPONENT_PIECE
@@ -296,35 +296,35 @@ class Move:
 
     # TODO __init__ method to dynamically generate moves at runtime
     def generate_valid_moves(self) -> List[Dict[ChessPiece, List[SQUARE_TYPE]]] | None:
-        '''
+        """
         Returns Square of piece
 
-        '''
+        """
         if not self.turn:
-            #TODO implement turn rotation
+            # TODO implement turn rotation
             raise AttributeError("Didn't implement turn rotation")
 
-
+        # self.get_king_moves()
+        # self.get_queen_moves()
+        # self.get_pawn_moves()
+        # self.get_rook_moves()
+        # self.get_knight_moves()
+        # self.get_knight_moves()
 
     # def get_pawn_moves(board_state, position):
     #     ...
 
-
     # def get_rook_moves(board_state, position):
     #     ...
-
 
     # def get_knight_moves(board_state, position):
     #     ...
 
-
     # def get_bishop_moves(board_state, position):
     #     ...
 
-
     # def get_queen_moves(board_state, position):
     #     ...
-
 
     # def get_king_moves(board_state, position):
     #     ...
@@ -336,7 +336,7 @@ class Move:
         return file in FILES and rank in RANKS
 
     def is_move_legal_for_piece(
-        self, piece: ChessPiece, current_square: SQUARE_TYPE, target_square: SQUARE_TYPE
+        self, piece: ChessPiece, current_square: SQUARE_TYPE, target_square: SQUARE_TYPE, game: Game
     ) -> bool:
 
         current_file = FILES.index(current_square[0])
@@ -346,11 +346,40 @@ class Move:
         target_rank = 7 - RANKS.index(target_square[1])
 
         match piece.PIECE_NAME:
+
+            # SQUARE IS OCCUPIED (CAN ONLY MOVE UP AND OVER)
             case PieceName.PAWN:
                 if piece.color == PieceColor.WHITE:
-                    return target_rank > current_rank
+                    # Forward movement
+                    if target_file == current_file:
+                        if target_rank == current_rank + 1 and not game.is_square_occupied(square=target_square):
+                            return True
+
+                        # Initial Double Movement
+                        if current_rank == StartingRank.WHITE_PAWN and target_rank == current_rank + 2:
+                            intermediate_square = (current_square[0], RANKS[6 - (current_rank + 1)])
+                            intermediate_square = cast(SQUARE_TYPE, "".join(intermediate_square).upper())
+                            if not game.is_square_occupied(square=target_square) and not game.is_square_occupied(square=intermediate_square):
+                                return True
+
+                    # Diagonal Capture
+                    if abs(target_file - current_file) == 1 and target_file == current_rank + 1:
+                        if game.is_square_occupied_by_oppenent(square=target_square, color=piece.color):
+                            return True
+
                 elif piece.color == PieceColor.BLACK:
-                    return target_rank < current_rank
+                    # Forward Movement
+                    if target_file == current_file:
+                        #TODO double check logic
+                        if target_rank == current_rank - 1 and not game.is_square_occupied(square=target_square):
+                            return True
+
+                        # Initial Double Movement
+                        if current_rank == StartingRank.BLACK_PAWN and target_rank == current_rank - 2:
+                            
+
+                    # return target_rank < current_rank
+
             case PieceName.KING:
                 ...
             case PieceName.QUEEN:

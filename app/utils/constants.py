@@ -43,6 +43,15 @@ class SquareStatus(IntEnum):
     OCCUPIED_BY_OWN_PIECE = 2
 
 
+# TODO fix offset for idx
+class StartingRank(IntEnum):
+    WHITE_PAWN = 1
+    WHITE_PIECES = 0
+
+    BLACK_PAWN = 6
+    BLACK_PIECES = 7
+
+
 """
 NOTE
 Chess Naming Schema

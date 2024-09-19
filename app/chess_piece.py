@@ -32,7 +32,9 @@ class ChessPiece(ABC):
 
     def get_valid_moves(self, board: ChessBoard, current_square: SQUARE_TYPE):
         piece_moves = self.piece_behavior()
-        move = Move()
+        # move = Move()
+            # maybe move implementation to player || game initialization
+
         # is_path_clear
 
         # king_not_in_check
