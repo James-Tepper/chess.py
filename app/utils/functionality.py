@@ -376,7 +376,18 @@ class Move:
 
                         # Initial Double Movement
                         if current_rank == StartingRank.BLACK_PAWN and target_rank == current_rank - 2:
-                            
+                            #TODO CHECK LINE
+                            intermediate_square = (current_square[0], RANKS[6 - (current_rank - 1)])
+                            intermediate_square = cast(SQUARE_TYPE, "".join(intermediate_square).upper())
+                            if not game.is_square_occupied(square=target_square) and not game.is_square_occupied(square=intermediate_square):
+                                return True
+                    # Diagonal Capture
+                    if abs(current_file - target_file) == 1 and target_file == current_rank - 1:
+                        if game.is_square_occupied_by_oppenent(square=target_square, color=piece.color):
+                            return True
+
+                else:
+                    raise AssertionError("Issue with pawn functionality")
 
                     # return target_rank < current_rank
 
