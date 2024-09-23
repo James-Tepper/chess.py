@@ -34,6 +34,24 @@ class Game:
         self.in_check = {PieceColor.WHITE: False, PieceColor.BLACK: False}
         self.king_moved = {PieceColor.WHITE: False, PieceColor.BLACK: False}
         # TODO implement way to check rook moved (for castling)
+        self.piece_types_on_board: Dict[PieceColor, List[PieceName]] = {
+            PieceColor.WHITE: [
+                PieceName.KING,
+                PieceName.QUEEN,
+                PieceName.ROOK,
+                PieceName.BISHOP,
+                PieceName.KNIGHT,
+                PieceName.PAWN,
+            ],
+            PieceColor.BLACK: [
+                PieceName.KING,
+                PieceName.QUEEN,
+                PieceName.ROOK,
+                PieceName.BISHOP,
+                PieceName.KNIGHT,
+                PieceName.PAWN,
+            ],
+        }
 
         # TODO can_castle 4 bools for each side
         self.can_castle = {PieceColor.WHITE: False, PieceColor.BLACK: False}
@@ -336,8 +354,16 @@ class Move:
         return file in FILES and rank in RANKS
 
     def is_move_legal_for_piece(
-        self, piece: ChessPiece, current_square: SQUARE_TYPE, target_square: SQUARE_TYPE, game: Game
+        self,
+        piece: ChessPiece,
+        current_square: SQUARE_TYPE,
+        target_square: SQUARE_TYPE,
+        game: Game,
     ) -> bool:
+        # Change bool ret to list maybe (or implement it on higher level)
+
+        if piece not in game.piece_types_on_board[self.color]:
+            return False
 
         current_file = FILES.index(current_square[0])
         current_rank = 7 - RANKS.index(current_square[1])
@@ -346,44 +372,83 @@ class Move:
         target_rank = 7 - RANKS.index(target_square[1])
 
         match piece.PIECE_NAME:
-
             # SQUARE IS OCCUPIED (CAN ONLY MOVE UP AND OVER)
             case PieceName.PAWN:
-                if piece.color == PieceColor.WHITE:
+                if self.turn == PieceColor.WHITE:
                     # Forward movement
                     if target_file == current_file:
-                        if target_rank == current_rank + 1 and not game.is_square_occupied(square=target_square):
+                        if (
+                            target_rank == current_rank + 1
+                            and not game.is_square_occupied(square=target_square)
+                        ):
                             return True
 
                         # Initial Double Movement
-                        if current_rank == StartingRank.WHITE_PAWN and target_rank == current_rank + 2:
-                            intermediate_square = (current_square[0], RANKS[6 - (current_rank + 1)])
-                            intermediate_square = cast(SQUARE_TYPE, "".join(intermediate_square).upper())
-                            if not game.is_square_occupied(square=target_square) and not game.is_square_occupied(square=intermediate_square):
+                        if (
+                            current_rank == StartingRank.WHITE_PAWN
+                            and target_rank == current_rank + 2
+                        ):
+                            intermediate_square = (
+                                current_square[0],
+                                RANKS[6 - (current_rank + 1)],
+                            )
+                            intermediate_square = cast(
+                                SQUARE_TYPE, "".join(intermediate_square).upper()
+                            )
+                            if not game.is_square_occupied(
+                                square=target_square
+                            ) and not game.is_square_occupied(
+                                square=intermediate_square
+                            ):
                                 return True
 
                     # Diagonal Capture
-                    if abs(target_file - current_file) == 1 and target_file == current_rank + 1:
-                        if game.is_square_occupied_by_oppenent(square=target_square, color=piece.color):
+                    if (
+                        abs(target_file - current_file) == 1
+                        and target_file == current_rank + 1
+                    ):
+                        if game.is_square_occupied_by_oppenent(
+                            square=target_square, color=piece.color
+                        ):
                             return True
 
-                elif piece.color == PieceColor.BLACK:
+                elif self.turn == PieceColor.BLACK:
                     # Forward Movement
                     if target_file == current_file:
-                        #TODO double check logic
-                        if target_rank == current_rank - 1 and not game.is_square_occupied(square=target_square):
+                        # TODO double check logic
+                        if (
+                            target_rank == current_rank - 1
+                            and not game.is_square_occupied(square=target_square)
+                        ):
                             return True
 
                         # Initial Double Movement
-                        if current_rank == StartingRank.BLACK_PAWN and target_rank == current_rank - 2:
-                            #TODO CHECK LINE
-                            intermediate_square = (current_square[0], RANKS[6 - (current_rank - 1)])
-                            intermediate_square = cast(SQUARE_TYPE, "".join(intermediate_square).upper())
-                            if not game.is_square_occupied(square=target_square) and not game.is_square_occupied(square=intermediate_square):
+                        if (
+                            current_rank == StartingRank.BLACK_PAWN
+                            and target_rank == current_rank - 2
+                        ):
+                            # TODO CHECK LINE
+                            intermediate_square = (
+                                current_square[0],
+                                RANKS[6 - (current_rank - 1)],
+                            )
+                            intermediate_square = cast(
+                                SQUARE_TYPE, "".join(intermediate_square).upper()
+                            )
+                            if not game.is_square_occupied(
+                                square=target_square
+                            ) and not game.is_square_occupied(
+                                square=intermediate_square
+                            ):
                                 return True
                     # Diagonal Capture
-                    if abs(current_file - target_file) == 1 and target_file == current_rank - 1:
-                        if game.is_square_occupied_by_oppenent(square=target_square, color=piece.color):
+                    if (
+                        abs(current_file - target_file) == 1
+                        and target_file == current_rank - 1
+                    ):
+                        if game.is_square_occupied_by_oppenent(
+                            square=target_square, color=piece.color
+                        ):
                             return True
 
                 else:
@@ -392,7 +457,8 @@ class Move:
                     # return target_rank < current_rank
 
             case PieceName.KING:
-                ...
+                if piece.color == PieceColor.WHITE:
+                    ...
             case PieceName.QUEEN:
                 ...
             case PieceName.ROOK:
