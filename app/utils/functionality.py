@@ -125,6 +125,13 @@ class Game:
                 BoardSquare(curr_file, "8")
             )
 
+    def can_castle_kingside(self, color):
+        ...
+
+
+    def can_castle_queenside(self, color):
+        ...
+
     def get_legal_moves(self) -> Dict[PieceName, SQUARE_TYPE]: ...
 
     def get_legal_moves_for_piece(self, piece: ChessPiece): ...
@@ -457,8 +464,26 @@ class Move:
                     # return target_rank < current_rank
 
             case PieceName.KING:
-                if piece.color == PieceColor.WHITE:
-                    ...
+                if abs(current_file - target_file) <= 1 and abs(current_rank - target_rank) <= 1:
+                    if not game.is_square_occupied_by_oppenent(square=target_square, color=piece.color):
+                        return True
+
+                # Castling
+                if piece.color == PieceColor.WHITE and current_square == "E1" and piece.has_moved == False:
+                    if target_square == "G1" and game.can_castle_kingside(piece.color):
+                        return True
+                    if target_square == "C1" and game.can_castle_queenside(piece.color):
+                        return True
+
+                if piece.color == PieceColor.BLACK and current_square == "E8" and piece.had_moved == False:
+                    if target_square == "G8" and game.can_castle_kingside(piece.color):
+                        return True
+                    if target_square == "C8" and game.can_castle_queenside(piece.color):
+                        return True
+
+                else:
+                    return False
+
             case PieceName.QUEEN:
                 ...
             case PieceName.ROOK:
@@ -481,7 +506,7 @@ class Move:
         if not self.is_within_board(target_square):
             return False
 
-        if not self.is_move_legal_for_piece(piece, current_square, target_square):
+        if not self.is_move_legal_for_piece(piece, current_square, target_square, game):
             return False
 
         return True
@@ -495,7 +520,7 @@ class Move:
     ):
         # update 'physical board'
         # update bitboard
-        if not self.is_valid(game, current_square, target_square):
+        if not self.is_valid(game, piece, current_square, target_square):
             return False
             #!!TODO implement is_valid checker for bitboard
 
